@@ -304,8 +304,7 @@ class CandidatoModel
 
     function buscarPorId($id)
     {
-        $sql = "SELECT * FROM candidatos
-                WHERE idCandidato = ?";
+        $sql = "SELECT * FROM candidatos WHERE idCandidato = ? LIMIT 1";
 
         $comando = $this->conexao->prepare($sql);
 
@@ -788,17 +787,24 @@ class CandidatoModel
         $whatsapp,
         $email,
         $curriculo,
-        $obs
+        $obs,
+        $nome
     ) {
         $sql = "
         UPDATE candidatos
         SET
 
-            telefone = ?,
-            whatsapp = ?,
-            email = ?,
-            curriculo = ?,
-            observacoes = ?
+        nome = ?,
+
+        telefone = ?,
+
+        whatsapp = ?,
+
+        email = ?,
+
+        curriculo = ?,
+
+        observacoes = ?
 
         WHERE idCandidato = ?
     ";
@@ -808,7 +814,8 @@ class CandidatoModel
             ->prepare($sql);
 
         $comando->bind_param(
-            "sisssi",
+            "ssisssi",
+            $nome,
             $telefone,
             $whatsapp,
             $email,

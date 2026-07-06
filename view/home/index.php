@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="pt-br">
 
 <head>
@@ -271,14 +270,11 @@
 
         <div class="modal-filtro-content modal-email">
 
-            <button
-                type="button"
+            <span
                 class="fechar-modal"
                 onclick="fecharModalEmail()">
-
                 &times;
-
-            </button>
+            </span>
 
             <div class="modal-email-icon">
 
@@ -335,7 +331,6 @@
 
             <span
                 class="fechar-detalhes">
-
                 &times;
 
             </span>
@@ -413,8 +408,8 @@
         <div class="modal-content">
 
             <span
-                class="fechar-modal">
-
+                class="fechar-modal"
+                id="fecharmodal-curriculo">
                 &times;
 
             </span>
@@ -779,8 +774,7 @@
             <button
                 type="button"
                 class="btn-fechar-modal"
-                onclick="fecharModalToken()">
-
+                id="fecharmodal-token">
                 &times;
 
             </button>
@@ -822,11 +816,10 @@
 
                 <button
                     type="button"
-                    class="btn btn-secundario"
-                    onclick="reenviarToken()">
-
-                    Reenviar código
-
+                    id="btnReenviarCodigo"
+                    class="btn-secundario"
+                    disabled>
+                    Reenviar código (60s)
                 </button>
 
             </div>
@@ -1531,8 +1524,7 @@
                 nomeExibicao: h.nome_exibicao ?? h.nome,
 
                 descricao: h.nome === "Outra Habilidade" ?
-                    h.nome_exibicao :
-                    "",
+                    h.nome_exibicao : "",
 
                 nivel: Number(h.nivel),
 
@@ -1586,6 +1578,7 @@
         document
             .getElementById("modalToken")
             .style.display = "flex";
+        iniciarContadorReenvio();
 
     }
 
@@ -1650,12 +1643,6 @@
         }
 
     });
-
-    function reenviarToken() {
-
-        alert("Em desenvolvimento");
-
-    }
 
 
     function verificarEmail() {
@@ -1802,6 +1789,116 @@
             });
 
     }
+
+    let tempoReenvio = 60;
+
+    let timerReenvio = null;
+
+    function iniciarContadorReenvio() {
+
+        const botao =
+            document.getElementById("btnReenviarCodigo");
+
+        tempoReenvio = 60;
+
+        botao.disabled = true;
+
+        botao.innerText =
+            `Reenviar código (${tempoReenvio}s)`;
+
+        if (timerReenvio) {
+
+            clearInterval(timerReenvio);
+
+        }
+
+        timerReenvio = setInterval(() => {
+
+            tempoReenvio--;
+
+            if (tempoReenvio <= 0) {
+
+                clearInterval(timerReenvio);
+
+                botao.disabled = false;
+
+                botao.innerText =
+                    "Reenviar código";
+
+                return;
+
+            }
+
+            botao.innerText =
+                `Reenviar código (${tempoReenvio}s)`;
+
+        }, 1000);
+
+    }
+
+    function reenviarCodigo() {
+
+        const botao =
+            document.getElementById("btnReenviarCodigo");
+
+        botao.disabled = true;
+
+        fetch(
+
+                "index.php?c=home&m=reenviarCodigo",
+
+                {
+
+                    method: "POST"
+
+                }
+
+            )
+
+            .then(res => res.json())
+
+            .then(retorno => {
+
+                document
+                    .getElementById("mensagemToken")
+                    .innerHTML =
+                    retorno.mensagem;
+
+                if (retorno.sucesso) {
+
+                    iniciarContadorReenvio();
+
+                } else {
+
+                    botao.disabled = false;
+
+                }
+
+            })
+
+            .catch(() => {
+
+                botao.disabled = false;
+
+                document
+                    .getElementById("mensagemToken")
+                    .innerHTML =
+                    "Erro ao reenviar o código.";
+
+            });
+
+    }
+
+    document
+        .getElementById("btnReenviarCodigo")
+
+        ?.addEventListener(
+
+            "click",
+
+            reenviarCodigo
+
+        );
 </script>
 <script src="public/js/habilidades.js"></script>
 

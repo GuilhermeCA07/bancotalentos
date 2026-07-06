@@ -202,11 +202,30 @@ class Home
         $email =
             trim($_POST['email']);
 
-        $candidato =
-            $this->candidatoModel
-            ->buscarPorEmail(
-                $email
-            );
+        /*
+        |--------------------------------------------------------------------------
+        | Verifica se já existe sessão do candidato
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($_SESSION['candidato'])) {
+
+            $idCandidato =
+                $_SESSION['candidato']['idCandidato'];
+
+            $candidato =
+                $this->candidatoModel
+                ->buscarPorId(
+                    $idCandidato
+                );
+        } else {
+
+            $candidato =
+                $this->candidatoModel
+                ->buscarPorEmail(
+                    $email
+                );
+        }
 
 
         if (
@@ -290,21 +309,50 @@ class Home
                 );
             }
 
+            /*
+            |--------------------------------------------------------------------------
+            | Verifica se o novo e-mail já pertence a outro candidato
+            |--------------------------------------------------------------------------
+            */
+
+            $emailExistente =
+                $this->candidatoModel
+                ->buscarPorEmail($email);
+
+            if (
+
+                $emailExistente
+
+                &&
+
+                $emailExistente['idCandidato']
+                !=
+                $idCandidato
+
+            ) {
+
+                $_SESSION['erro'] =
+                    "Este e-mail já está sendo utilizado por outro candidato.";
+
+                $this->atualizarSessaoCandidato($idCandidato);
+
+                header("Location:?c=home");
+
+                exit;
+            }
+
+
             $this->candidatoModel
                 ->atualizarDadosModal(
 
                     $candidato['idCandidato'],
-
                     $telefone,
-
                     $whatsapp,
-
                     $email,
-
                     $curriculo
                         ?: $candidato['curriculo'],
-
-                    $observacoes
+                    $observacoes,
+                    $nome
 
                 );
 
@@ -553,36 +601,30 @@ class Home
 
         return null;
     }
-
     public function cadastrarCurriculo()
     {
+        /*
+    if (!$this->validarTurnstile()) {
 
-        // Voltar o Cloudfire
-        /*if (!$this->validarTurnstile()) {
+        $_SESSION['erro'] =
+            "Falha na validação de segurança.";
 
-            $_SESSION['erro'] =
-                "Falha na validação de segurança.";
+        header("Location:?c=home");
+        exit;
+    }
+    */
 
-            header(
-                "Location:?c=home"
-            );
-
-            exit;
-        }*/
-
-        if (
-            !isset($_POST['aceite_lgpd'])
-        ) {
+        if (!isset($_POST['aceite_lgpd'])) {
 
             $_SESSION['erro'] =
                 "É necessário aceitar os termos para continuar.";
 
-            header(
-                "Location:?c=home"
-            );
-
+            header("Location:?c=home");
             exit;
         }
+
+        $nome =
+            trim($_POST['nome']);
 
         $telefone =
             preg_replace(
@@ -594,39 +636,90 @@ class Home
         $email =
             trim($_POST['email']);
 
+        $observacoes =
+            trim($_POST['observacoes'] ?? '');
+
+        $whatsapp =
+            isset($_POST['whatsapp']) ? 1 : 0;
+
         /*
         |--------------------------------------------------------------------------
-        | Verifica candidato existente
+        | Localiza candidato
         |--------------------------------------------------------------------------
         */
 
-        $candidato =
-            $this->candidatoModel
-            ->buscarPorEmail(
-                $email
-            );
+        if (!empty($_SESSION['candidato'])) {
+
+            $idCandidato =
+                $_SESSION['candidato']['idCandidato'];
+
+            $candidato =
+                $this->candidatoModel
+                ->buscarPorId($idCandidato);
+        } else {
+
+            $candidato =
+                $this->candidatoModel
+                ->buscarPorEmail($email);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Atualização
+        |--------------------------------------------------------------------------
+        */
 
         if ($candidato) {
 
+            $idCandidato =
+                $candidato['idCandidato'];
+
             /*
-            |----------------------------------------------------------
-            | Atualiza currículo existente
-            |----------------------------------------------------------
+            |--------------------------------------------------------------------------
+            | Verifica se o novo e-mail pertence a outro candidato
+            |--------------------------------------------------------------------------
             */
+
+            $emailExistente =
+                $this->candidatoModel
+                ->buscarPorEmail($email);
+
+            if (
+
+                $emailExistente
+
+                &&
+
+                $emailExistente['idCandidato']
+                !=
+                $idCandidato
+
+            ) {
+
+                $_SESSION['erro'] =
+                    "Este e-mail já está sendo utilizado por outro candidato.";
+
+                $this->atualizarSessaoCandidato($idCandidato);
+
+                header("Location:?c=home");
+                exit;
+            }
 
             $curriculoNovo =
                 $this->salvarCurriculo();
 
-            /*
-            |----------------------------------------------------------
-            | Remove currículo antigo
-            |----------------------------------------------------------
-            */
-
             if (
-                $curriculoNovo &&
-                !empty($candidato['curriculo']) &&
+
+                $curriculoNovo
+
+                &&
+
+                !empty($candidato['curriculo'])
+
+                &&
+
                 file_exists($candidato['curriculo'])
+
             ) {
 
                 unlink(
@@ -637,27 +730,32 @@ class Home
             $this->candidatoModel
                 ->atualizarDadosModal(
 
-                    $candidato['idCandidato'],
+                    $idCandidato,
+
+                    $nome,
 
                     $telefone,
 
-                    isset($_POST['whatsapp']) ? 1 : 0,
+                    $whatsapp,
 
                     $email,
 
                     $curriculoNovo
                         ?: $candidato['curriculo'],
 
-                    $_POST['observacoes']
+                    $observacoes
 
                 );
 
             $_SESSION['curriculo_atualizado'] =
-                "Você já estava em nosso banco de talentos. Seus dados, currículo e habilidades foram atualizados com sucesso.";
+                "Você já estava em nosso banco de talentos. Seus dados, currículo e habilidades foram atualizados com sucesso!";
+        }
 
-            $idCandidato =
-                $candidato['idCandidato'];
-        } else {
+        /*
+        |--------------------------------------------------------------------------
+        | Novo candidato
+        |--------------------------------------------------------------------------
+        */ else {
 
             $curriculo =
                 $this->salvarCurriculo();
@@ -665,45 +763,46 @@ class Home
             $this->candidatoModel
                 ->inserir(
 
-                    $_POST['nome'],
+                    $nome,
+
                     $telefone,
-                    isset($_POST['whatsapp']) ? 1 : 0,
+
+                    $whatsapp,
+
                     $email,
+
                     $curriculo,
-                    $_POST['observacoes']
+
+                    $observacoes
 
                 );
-
-            $_SESSION['sucesso_curriculo'] =
-                "Currículo enviado com sucesso! Agora você faz parte do nosso banco de talentos.";
 
             $idCandidato =
                 $this->candidatoModel
                 ->buscarUltimoId();
+
+            $_SESSION['sucesso_curriculo'] =
+                "Currículo enviado com sucesso! Agora você faz parte do nosso banco de talentos.";
         }
 
-
         /*
-|--------------------------------------------------------------------------
-| Salva habilidades
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | Salva / Atualiza habilidades
+    |--------------------------------------------------------------------------
+    */
 
         if (isset($_POST['habilidade'])) {
 
             foreach ($_POST['habilidade'] as $indice => $idHabilidade) {
 
                 $nivel =
-                    $_POST['nivel'][$indice]
-                    ?? 0;
+                    $_POST['nivel'][$indice] ?? 0;
 
                 $nomeExibicao =
-                    $_POST['nome_exibicao'][$indice]
-                    ?? '';
+                    $_POST['nome_exibicao'][$indice] ?? '';
 
                 $nomeHabilidade =
-                    $_POST['habilidade_nome'][$indice]
-                    ?? '';
+                    $_POST['habilidade_nome'][$indice] ?? '';
 
                 $jaExiste =
                     $this->candidatoModel
@@ -723,31 +822,45 @@ class Home
 
                     $this->candidatoModel
                         ->atualizarHabilidade(
+
                             $idCandidato,
+
                             $idHabilidade,
+
                             $nomeExibicao,
+
                             $nivel
+
                         );
                 } else {
 
                     $this->candidatoModel
                         ->salvarHabilidade(
+
                             $idCandidato,
+
                             $idHabilidade,
+
                             $nomeExibicao,
+
                             $nivel
+
                         );
                 }
             }
         }
 
-        header(
-            "Location:?c=home"
-        );
+        /*
+    |--------------------------------------------------------------------------
+    | Atualiza sessão
+    |--------------------------------------------------------------------------
+    */
 
+        $this->atualizarSessaoCandidato($idCandidato);
+
+        header("Location:?c=home");
         exit;
     }
-
     public function verificarEmail()
     {
 
@@ -824,7 +937,6 @@ class Home
         $enviado = Mail::enviarToken(
 
             $email,
-
             $resultado['token']
 
         );
@@ -997,6 +1109,75 @@ class Home
 
             'sucesso' => $resultado,
             'habilidades' => $_SESSION['candidato']['habilidades']
+
+        ]);
+    }
+
+    public function reenviarCodigo()
+    {
+        header('Content-Type: application/json');
+
+        if (empty($_SESSION['email_verificacao'])) {
+
+            echo json_encode([
+                "sucesso" => false,
+                "mensagem" => "Sessão expirada."
+            ]);
+
+            return;
+        }
+
+        $email = $_SESSION['email_verificacao'];
+
+        $candidato =
+            $this->candidatoModel
+            ->buscarPorEmail($email);
+
+        if (!$candidato) {
+
+            echo json_encode([
+                "sucesso" => false,
+                "mensagem" => "Candidato não encontrado."
+            ]);
+
+            return;
+        }
+
+        $resultado =
+            $this->tokenModel
+            ->gerarToken(
+
+                $candidato['idCandidato'],
+
+                $email
+
+            );
+
+        if (!$resultado['sucesso']) {
+
+            echo json_encode($resultado);
+
+            return;
+        }
+
+        $enviado =
+            Mail::enviarToken(
+
+                $email,
+
+                $resultado['token']
+
+            );
+
+        echo json_encode([
+
+            "sucesso" => $enviado === true,
+
+            "mensagem" =>
+
+            $enviado === true
+                ? "Novo código enviado com sucesso."
+                : "Erro ao enviar o código."
 
         ]);
     }

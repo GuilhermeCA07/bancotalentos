@@ -139,7 +139,7 @@ class CandidatoTokenModel
 
             "Y-m-d H:i:s",
 
-            strtotime("+15 minutes")
+            strtotime("+5 minutes")
 
         );
 
@@ -257,7 +257,7 @@ class CandidatoTokenModel
 
         $update = $this->conexao->prepare($sql);
 
-        
+
 
         $update->bind_param(
 
@@ -316,5 +316,33 @@ class CandidatoTokenModel
         return (
             time() - $ultima
         ) >= 60;
+    }
+
+    public function removerTokens($email)
+    {
+
+        $sql = "
+
+        DELETE
+
+        FROM tokens_verificacao
+
+        WHERE email = ?
+
+    ";
+
+        $comando =
+            $this->conexao
+            ->prepare($sql);
+
+        $comando->bind_param(
+
+            "s",
+
+            $email
+
+        );
+
+        return $comando->execute();
     }
 }
