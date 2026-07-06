@@ -1,0 +1,617 @@
+<div class="topo">
+
+    <h1>Candidatos</h1>
+
+    <a href="?c=candidato&m=add" class="btn">
+        Novo Candidato
+    </a>
+
+</div>
+
+<div class="toolbar">
+
+    <div class="busca-container">
+
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <form method="GET" id="formFiltros" class="form-busca">
+
+            <input
+                type="hidden"
+                name="c"
+                value="candidato">
+
+            <input
+                type="text"
+                name="busca"
+                placeholder="Nome, Telefone ou Email"
+                value="<?= $_GET['busca'] ?? '' ?>">
+
+            <select name="status_candidato">
+
+                <option value="">
+                    Todos os Status
+                </option>
+
+                <option value="Em Analise"
+                    <?= ($_GET['status_candidato'] ?? '') == 'Em Analise' ? 'selected' : '' ?>>
+                    Em Análise
+                </option>
+
+                <option value="Aprovado"
+                    <?= ($_GET['status_candidato'] ?? '') == 'Aprovado' ? 'selected' : '' ?>>
+                    Aprovado
+                </option>
+
+                <option value="Reprovado"
+                    <?= ($_GET['status_candidato'] ?? '') == 'Reprovado' ? 'selected' : '' ?>>
+                    Reprovado
+                </option>
+
+            </select>
+
+            <div class="filtros-avancados">
+
+                <button
+                    type="button"
+                    class="btn-filtro"
+                    onclick="abrirModalCategorias()">
+
+                    Categorias
+
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-filtro"
+                    onclick="abrirModalHabilidades()">
+
+                    Habilidades
+
+                </button>
+
+            </div>
+
+            <!-- ### MODEL DE VIEW DO CURRICULO ###  -->
+            <div id="modalCurriculo" class="modal-curriculo">
+
+                <div class="modal-curriculo-content">
+
+                    <div class="modal-curriculo-header">
+
+                        <h3>
+                            Currículo
+                        </h3>
+
+                        <button
+                            type="button"
+                            onclick="fecharCurriculo()">
+
+                            ×
+
+                        </button>
+
+                    </div>
+
+                    <div id="curriculoMensagem">
+
+                    </div>
+
+                    <iframe
+                        id="iframeCurriculo"
+                        style="
+                width:100%;
+                height:600px;
+                display:none;
+            ">
+                    </iframe>
+
+                    <div class="modal-curriculo-footer">
+
+                        <a
+                            id="btnDownloadCurriculo"
+                            class="btn">
+
+                            Baixar Currículo
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn">
+                Buscar
+            </button>
+
+        </form>
+
+        <!-- ### MODAL DE VIEW DAS HABILIDADES ### --->
+
+        <div
+            id="modalHabilidades"
+            class="modal-filtro">
+
+            <div class="modal-filtro-content">
+
+                <button
+                    type="button"
+                    class="btn-fechar-modal"
+                    onclick="fecharModalHabilidades()">
+
+                    &times;
+
+                </button>
+
+                <h3>Filtrar por Habilidades</h3>
+
+                <input
+                    type="text"
+                    id="pesquisaHabilidade"
+                    placeholder="Pesquisar habilidade...">
+
+                <div class="lista-filtros">
+
+                    <?php foreach ($habilidades as $habilidade): ?>
+
+                        <label
+                            class="item-filtro habilidade-item">
+
+                            <input
+                                type="checkbox"
+                                form="formFiltros"
+                                name="habilidade[]"
+                                value="<?= $habilidade['idHabilidade'] ?>"
+
+                                <?= in_array(
+                                    $habilidade['idHabilidade'],
+                                    $_GET['habilidade'] ?? []
+                                ) ? 'checked' : '' ?>>
+
+                            <strong>
+                                <?= $habilidade['categoria'] ?>
+                            </strong>
+
+                            →
+
+                            <?= $habilidade['nome'] ?>
+
+                        </label>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ### MODAL DE VIEW DAS CATEGORIAS ### --->
+
+        <div
+            id="modalCategorias"
+            class="modal-filtro">
+
+            <div class="modal-filtro-content">
+
+                <button
+                    type="button"
+                    class="btn-fechar-modal"
+                    onclick="fecharModalCategorias()">
+
+                    &times;
+
+                </button>
+
+                <h3>Filtrar por Categorias</h3>
+
+                <input
+                    type="text"
+                    id="pesquisaCategoria"
+                    placeholder="Pesquisar categoria...">
+
+                <div class="lista-filtros">
+
+                    <?php foreach ($categorias as $categoria): ?>
+
+                        <label class="item-filtro categoria-item">
+
+                            <input
+                                type="checkbox"
+                                form="formFiltros"
+                                name="categoria[]"
+                                value="<?= $categoria['idCategoria'] ?>"
+
+                                <?= in_array(
+                                    $categoria['idCategoria'],
+                                    $_GET['categoria'] ?? []
+                                ) ? 'checked' : '' ?>>
+
+                            <?= $categoria['nome'] ?>
+
+                        </label>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<table>
+
+
+    <thead>
+
+        <tr>
+            <th>Nome</th>
+            <th class="col-telefone">Telefone</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Curriculo</th>
+            <th class="col-acoes">Ações</th>
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        <?php foreach ($candidatos as $candidato): ?>
+
+            <tr>
+
+                <td>
+                    <a
+                        class="link-candidato"
+                        href="?c=candidato&m=visualizar&id=<?= $candidato['idCandidato'] ?>">
+
+                        <i class="fa-solid fa-user"></i>
+
+                        <?= $candidato['nome'] ?>
+
+                    </a>
+                </td>
+
+                <td class="col-telefone"><?= formatarTelefone($candidato['telefone']) ?></td>
+
+                <td><?= $candidato['email'] ?></td>
+
+                <td>
+
+                    <?php
+
+                    $status =
+                        $candidato['status_candidato'];
+
+                    ?>
+
+                    <span class="status-candidato
+
+<?=
+            strtolower(
+                str_replace(
+                    ' ',
+                    '-',
+                    $status
+                )
+            )
+?>
+
+">
+
+                        <?= $status ?>
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <?php
+                    $extensao =
+                        strtolower(
+                            pathinfo(
+                                $candidato['curriculo'],
+                                PATHINFO_EXTENSION
+                            )
+                        );
+
+                    ?>
+
+                    <?php if (!empty($candidato['curriculo'])): ?>
+
+                        <a class="btn"
+                            href="#"
+                            onclick="
+                            abrirCurriculo(
+                                <?= $candidato['idCandidato'] ?>,
+                                '<?= $extensao ?>'
+                            );
+                            return false;
+                        ">
+
+                            <i class="fa-solid fa-file"></i>
+
+                            Currículo
+
+                        </a>
+
+                    <?php endif; ?>
+
+                </td>
+
+                <td class="acoes-coluna">
+
+                    <div class="dropdown-acoes">
+
+                        <button
+                            type="button"
+                            class="btn-dropdown col-acoes"
+                            onclick="toggleDropdown(this)">
+
+                            <i class="fa-solid fa-bars"></i>
+
+                            Ações
+
+                            <i class="fa-solid fa-chevron-down"></i>
+
+                        </button>
+
+                        <div class="dropdown-menu">
+
+                            <a
+                                href="?c=candidato&m=editar&id=<?= $candidato['idCandidato'] ?>"
+                                class="btn-action btn-editar">
+                                <i class="fa-solid fa-pen"></i>
+                                Editar
+                            </a>
+
+                            <a
+                                href="?c=candidato&m=visualizar&id=<?= $candidato['idCandidato'] ?>"
+                                class="btn-action btn-editar">
+                                <i class="fa-solid fa-eye"></i>
+                                Visualizar
+                            </a>
+
+                            <a
+                                href="?c=candidato&m=excluir&id=<?= $candidato['idCandidato'] ?>"
+                                class="btn-action btn-excluir"
+                                onclick="return confirm('Deseja realmente excluir?')">
+                                <i class="fa-solid fa-trash"></i>
+                                Excluir
+                            </a>
+                        </div>
+                    </div>
+
+                </td>
+
+            </tr>
+
+        <?php endforeach; ?>
+
+    </tbody>
+
+</table>
+
+<script>
+    function abrirCurriculo(
+        id,
+        extensao
+    ) {
+        const iframe =
+            document.getElementById(
+                'iframeCurriculo'
+            );
+
+        const msg =
+            document.getElementById(
+                'curriculoMensagem'
+            );
+
+        if (
+            extensao.toLowerCase() ===
+            'pdf'
+        ) {
+
+            iframe.style.display =
+                'block';
+
+            msg.innerHTML = '';
+
+            iframe.src =
+                '?c=candidato&m=visualizarCurriculo&id=' +
+                id;
+
+        } else {
+
+            iframe.style.display =
+                'none';
+
+            iframe.src = '';
+
+            msg.innerHTML =
+                '<p>Visualização disponível apenas para PDF.</p>';
+        }
+
+        document
+            .getElementById(
+                'btnDownloadCurriculo'
+            )
+            .href =
+            '?c=candidato&m=baixarCurriculo&id=' +
+            id;
+
+        document
+            .getElementById(
+                'modalCurriculo'
+            )
+            .style.display =
+            'flex';
+    }
+
+    function fecharCurriculo() {
+        document
+            .getElementById(
+                'modalCurriculo'
+            )
+            .style.display =
+            'none';
+
+        document
+            .getElementById(
+                'iframeCurriculo'
+            )
+            .src = '';
+    }
+
+    function abrirModalCategorias() {
+
+        document
+            .getElementById(
+                "modalCategorias"
+            )
+            .style.display = "flex";
+    }
+
+    function abrirModalHabilidades() {
+
+        document
+            .getElementById(
+                "modalHabilidades"
+            )
+            .style.display =
+            "flex";
+    }
+
+
+
+    function fecharModalCategorias() {
+
+        document
+            .getElementById(
+                "modalCategorias"
+            )
+            .style.display = "none";
+    }
+
+    function fecharModalHabilidades() {
+
+        document
+            .getElementById(
+                "modalHabilidades"
+            )
+            .style.display =
+            "none";
+    }
+
+    window.addEventListener(
+        "click",
+        function(e) {
+
+            const modalHabilidades =
+                document.getElementById(
+                    "modalHabilidades"
+                );
+
+            if (e.target === modalHabilidades) {
+
+                fecharModalHabilidades();
+            }
+
+        }
+    );
+
+    window.addEventListener(
+        "click",
+        function(e) {
+
+            const modalCategorias =
+                document.getElementById(
+                    "modalCategorias"
+                );
+
+            if (e.target === modalCategorias) {
+
+                fecharModalCategorias();
+            }
+
+        }
+    );
+    const campoPesquisaHabilidade =
+        document.getElementById(
+            'pesquisaHabilidade'
+        );
+
+    if (campoPesquisaHabilidade) {
+
+        campoPesquisaHabilidade.addEventListener(
+            'keyup',
+            function() {
+
+                const termo =
+                    this.value
+                    .toLowerCase();
+
+                document
+                    .querySelectorAll(
+                        '.habilidade-item'
+                    )
+                    .forEach(item => {
+
+                        const texto =
+                            item.textContent
+                            .toLowerCase();
+
+                        item.style.display =
+                            texto.includes(termo) ?
+                            'flex' :
+                            'none';
+                    });
+            }
+        );
+    }
+
+    const campoPesquisaCategoria =
+        document.getElementById(
+            'pesquisaCategoria'
+        );
+
+    if (campoPesquisaCategoria) {
+
+        campoPesquisaCategoria.addEventListener(
+            'keyup',
+            function() {
+
+                const termo =
+                    this.value
+                    .toLowerCase();
+
+                document
+                    .querySelectorAll(
+                        '.categoria-item'
+                    )
+                    .forEach(item => {
+
+                        const texto =
+                            item.textContent
+                            .toLowerCase();
+
+                        item.style.display =
+                            texto.includes(termo) ?
+                            'flex' :
+                            'none';
+                    });
+            }
+        );
+    }
+</script>
+<script src="public/js/pesquisa.js"></script>

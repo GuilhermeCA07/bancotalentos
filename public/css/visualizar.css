@@ -1,0 +1,361 @@
+.card-visualizacao {
+
+    background: #fff;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, .08),
+        0 2px 8px rgba(0, 0, 0, .04);
+
+    border: 1px solid #eef2f7;
+
+    transition: .3s;
+}
+
+.card-visualizacao:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 16px 35px rgba(0, 0, 0, .10),
+        0 4px 12px rgba(0, 0, 0, .06);
+}
+
+.card-header {
+
+    padding: 25px 30px;
+
+    background:
+        linear-gradient(135deg,
+            var(--azul),
+            #1e40af);
+
+    color: white;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 15px;
+}
+
+.card-header h2,
+.card-header h3 {
+
+    margin: 0;
+
+    font-size: 24px;
+
+    font-weight: 700;
+}
+
+.card-body {
+
+    padding: 30px;
+}
+
+.info-item {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    padding: 15px 0;
+
+    border-bottom: 1px solid #edf2f7;
+}
+
+.info-item:last-child {
+
+    border-bottom: none;
+}
+
+.info-item .label {
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    color: #64748b;
+
+    font-weight: 600;
+}
+
+.info-item span:last-child {
+
+    font-size: 16px;
+
+    color: #0f172a;
+
+    font-weight: 500;
+}
+
+.status-badge {
+
+    padding: 8px 18px;
+
+    border-radius: 50px;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: .5px;
+}
+
+.status-aprovado {
+
+    background: #dcfce7;
+
+    color: #166534;
+}
+
+.status-recusado {
+
+    background: #fee2e2;
+
+    color: #991b1b;
+}
+
+.status-analise {
+
+    background: #fef3c7;
+
+    color: #92400e;
+}
+
+.status-entrevista {
+
+    background: #dbeafe;
+
+    color: #1d4ed8;
+}
+
+.lista-habilidades {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+}
+
+.habilidade-tag {
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--azul),
+            #1e40af
+        );
+
+    color: white;
+
+    padding: 12px 18px;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+    min-width: 140px;
+
+    box-shadow:
+        0 4px 10px rgba(37,99,235,.2);
+}
+
+.habilidade-tag strong {
+
+    font-size: 14px;
+}
+
+.habilidade-tag small {
+
+    opacity: .85;
+}
+
+.btn-whatsapp {
+
+    margin: 25px auto 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    width: fit-content;
+
+    padding: 12px 24px;
+
+    border-radius: 50px;
+
+    background: #25d366;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-weight: 600;
+
+    transition: .3s;
+}
+
+.btn-whatsapp:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 10px 20px rgba(37,211,102,.3);
+}
+
+.titulo-pagina {
+
+    font-size: 30px;
+
+    font-weight: 700;
+
+    color: #0f172a;
+
+    margin-bottom: 25px;
+}
+
+
+
+.modal-curriculo {
+    display: none;
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.65);
+
+    z-index: 9999;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+}
+
+.modal-curriculo-content {
+
+    width: 95%;
+    max-width: 1400px;
+    height: 95vh;
+
+    background: #fff;
+
+    border-radius: 12px;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, .3);
+}
+
+.modal-curriculo-header {
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 20px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    background: #f8fafc;
+}
+
+.modal-curriculo-header h3 {
+
+    margin: 0;
+
+    font-size: 18px;
+}
+
+.modal-curriculo-header button {
+
+    border: none;
+    background: transparent;
+
+    font-size: 28px;
+
+    cursor: pointer;
+
+    line-height: 1;
+}
+
+.modal-curriculo-footer {
+
+    padding: 25px;
+
+    border-top: 1px solid #e5e7eb;
+
+    background: #f8fafc;
+
+    display: flex;
+    justify-content: flex-end;
+}
+
+#iframeCurriculo {
+    width: 100%;
+    height: calc(95vh - 110px);
+    border: none;
+}
+
+#curriculoMensagem {
+
+    flex: 1;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    font-size: 18px;
+
+    color: #666;
+
+    padding: 30px;
+}
+
+.modal-curriculo-content {
+    width: 90%;
+    max-width: 1200px;
+    height: 90vh;
+
+    display: flex;
+    flex-direction: column;
+}

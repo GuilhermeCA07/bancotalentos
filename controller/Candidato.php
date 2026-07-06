@@ -1,0 +1,444 @@
+<?php
+
+require "model/CandidatoModel.php";
+require "model/HabilidadeModel.php";
+require_once "helper/Autorizacao.php";
+require_once "helper/Retorno.php";
+require_once "model/CategoriaModel.php";
+
+class Candidato
+{
+    private $model;
+    private $habilidadeModel;
+    private $categoriaModel;
+
+
+    function __construct()
+    {
+
+        validarPermissao('candidato');
+
+        $this->model = new CandidatoModel();
+        $this->habilidadeModel = new HabilidadeModel();
+        $this->categoriaModel = new CategoriaModel();
+    }
+
+    function index()
+    {
+
+
+
+        function formatarTelefone($telefone)
+        {
+            $telefone =
+                preg_replace(
+                    '/\D/',
+                    '',
+                    $telefone
+                );
+
+            if (strlen($telefone) == 11) {
+
+                return preg_replace(
+                    '/(\d{2})(\d{5})(\d{4})/',
+                    '($1) $2-$3',
+                    $telefone
+                );
+            }
+
+            return $telefone;
+        }
+
+        $filtros = [
+
+            'busca' =>
+            trim(
+                $_GET['busca']
+                    ?? ''
+            ),
+
+            'status_candidato' =>
+            $_GET['status_candidato']
+                ?? '',
+
+            'categoria' =>
+            $_GET['categoria']
+                ?? '',
+
+            'habilidade' =>
+            $_GET['habilidade']
+                ?? '',
+
+            'pagina' =>
+            isset($_GET['pagina'])
+                ? (int)$_GET['pagina']
+                : 1
+
+        ];
+
+
+        $totalRegistros = $this->model->contarRegistros($filtros);
+
+        $registrosPorPagina = 10;
+
+        $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
+
+        $paginaAtual = max(1, $filtros['pagina']);
+
+        $offset = ($paginaAtual - 1) * $registrosPorPagina;
+
+        $candidatos = $this->model->buscarTodos($filtros, $registrosPorPagina, $offset);
+
+        $habilidades = $this->habilidadeModel->buscarAtivas();
+        $categorias = $this->categoriaModel->buscarAtivas();
+
+        salvarRetorno();
+
+        include "view/template/cabecalho.php";
+        include "view/template/menu.php";
+        include "view/candidato/listagem.php";
+        include "view/template/paginacao.php";
+        include "view/template/rodape.php";
+    }
+
+    function add()
+    {
+        $habilidades =
+            $this->habilidadeModel
+            ->buscarTodos();
+
+        $habilidades =
+            $this->habilidadeModel
+            ->buscarTodos();
+
+        $habilidadesSelecionadas = [];
+
+        include "view/template/cabecalho.php";
+        include "view/template/menu.php";
+        include "view/candidato/form.php";
+        include "view/template/rodape.php";
+    }
+
+    public function visualizar($id)
+    {
+        $candidato =
+            $this->model
+            ->buscarPorId($id);
+
+        $habilidades =
+            $this->model
+            ->buscarHabilidades(
+                $id
+            );
+
+        include "view/template/cabecalho.php";
+        include "view/template/menu.php";
+        include "view/candidato/visualizar.php";
+        include "view/template/rodape.php";
+    }
+
+    function salvar()
+    {
+
+        if (isset($_POST['nome']) && !empty($_POST['nome'])) {
+
+            $whatsapp = isset($_POST['whatsapp']) ? 1 : 0;
+
+            $curriculo = $this->salvarCurriculo();
+
+
+            if (empty($_POST['idCandidato'])) {
+
+                $telefone =
+                    preg_replace(
+                        '/\D/',
+                        '',
+                        $_POST['telefone']
+                    );
+
+                $this->model->inserir(
+                    $_POST['nome'],
+                    $telefone,
+                    $whatsapp,
+                    $_POST['email'],
+                    $curriculo,
+                    $_POST['observacoes']
+                );
+
+                $idCandidato = $this->model->buscarUltimoId();
+            } else {
+
+                $curriculoAtual = $_POST['curriculo_atual'] ?? null;
+
+                if (empty($curriculo)) {
+                    $curriculo = $curriculoAtual;
+                }
+
+                $telefone =
+                    preg_replace(
+                        '/\D/',
+                        '',
+                        $_POST['telefone']
+                    );
+
+                $this->model->atualizar(
+                    $_POST['idCandidato'],
+                    $_POST['nome'],
+                    $telefone,
+                    $whatsapp,
+                    $_POST['email'],
+                    $curriculo,
+                    $_POST['observacoes']
+                );
+
+                $idCandidato = $_POST['idCandidato'];
+            }
+
+            $this->model->limparHabilidades($idCandidato);
+
+            if (isset($_POST['habilidade'])) {
+
+                foreach ($_POST['habilidade'] as $idHabilidade) {
+
+                    $nivel = $_POST['nivel'][$idHabilidade] ?? 0;
+
+                    if (
+                        isset($_POST['descricao_personalizada'][$idHabilidade])
+                        && !empty($_POST['descricao_personalizada'][$idHabilidade])
+                    ) {
+                        $descricao =
+                            $_POST['descricao_personalizada'][$idHabilidade];
+                    }
+
+                    $nomeExibicao =
+                        $_POST['nome_exibicao'][$idHabilidade]
+                        ?? '';
+
+                    $this->model->salvarHabilidade(
+                        $idCandidato,
+                        $idHabilidade,
+                        $nomeExibicao,
+                        $nivel
+                    );
+                }
+            }
+
+
+            voltarParaRetorno("?c=candidato");
+        }
+    }
+
+    function editar($id)
+    {
+        $candidato =
+            $this->model->buscarPorId($id);
+
+        $habilidades =
+            $this->habilidadeModel
+            ->buscarTodos();
+
+        $habilidadesSelecionadas =
+            $this->model
+            ->buscarHabilidades($id);
+
+        include "view/template/cabecalho.php";
+        include "view/template/menu.php";
+        include "view/candidato/form.php";
+        include "view/template/rodape.php";
+    }
+
+    function excluir($id)
+    {
+        $this->model->excluir($id);
+
+        voltarParaRetorno("?c=candidato");
+    }
+
+    function salvarCurriculo()
+    {
+        if (
+            isset($_FILES['curriculo']) &&
+            $_FILES['curriculo']['error'] === 0
+        ) {
+
+            $permitidos = [
+                'pdf',
+                'doc',
+                'docx',
+                'jpg',
+                'jpeg',
+                'png'
+            ];
+
+            $extensao = strtolower(
+                pathinfo(
+                    $_FILES['curriculo']['name'],
+                    PATHINFO_EXTENSION
+                )
+            );
+
+            if (!in_array($extensao, $permitidos)) {
+                return null;
+            }
+
+            $nomeArquivo =
+                time() .
+                "_" .
+                preg_replace(
+                    '/[^a-zA-Z0-9._-]/',
+                    '',
+                    $_FILES['curriculo']['name']
+                );
+
+            $diretorio = "uploads/curriculos/";
+
+            if (!is_dir($diretorio)) {
+                mkdir($diretorio, 0777, true);
+            }
+
+            $destino = $diretorio . $nomeArquivo;
+
+            if (
+                move_uploaded_file(
+                    $_FILES['curriculo']['tmp_name'],
+                    $destino
+                )
+            ) {
+                return $destino;
+            }
+        }
+
+        return null;
+    }
+
+    public function baixarCurriculo($id)
+    {
+        $candidato =
+            $this->model
+            ->buscarPorId($id);
+
+        if (
+            !$candidato
+            ||
+            empty($candidato['curriculo'])
+        ) {
+            exit;
+        }
+
+        $arquivo =
+            $candidato['curriculo'];
+
+        if (!file_exists($arquivo)) {
+            exit;
+        }
+
+        $extensao =
+            pathinfo(
+                $arquivo,
+                PATHINFO_EXTENSION
+            );
+
+        $nomeArquivo =
+            'Curriculo_' .
+            preg_replace(
+                '/[^a-zA-Z0-9]/',
+                '_',
+                $candidato['nome']
+            )
+            . '.'
+            . $extensao;
+
+        header(
+            'Content-Type: application/octet-stream'
+        );
+
+        header(
+            'Content-Disposition: attachment; filename="' .
+                $nomeArquivo .
+                '"'
+        );
+
+        readfile($arquivo);
+
+        exit;
+    }
+
+    public function visualizarCurriculo($id)
+    {
+        $candidato =
+            $this->model
+            ->buscarPorId($id);
+
+        if (
+            !$candidato
+            ||
+            empty($candidato['curriculo'])
+        ) {
+            exit;
+        }
+
+        $arquivo =
+            $candidato['curriculo'];
+
+        if (!file_exists($arquivo)) {
+            exit;
+        }
+
+        $extensao =
+            strtolower(
+                pathinfo(
+                    $arquivo,
+                    PATHINFO_EXTENSION
+                )
+            );
+
+        if ($extensao !== 'pdf') {
+            exit;
+        }
+
+        header(
+            'Content-Type: application/pdf'
+        );
+
+        header(
+            'Content-Disposition: inline'
+        );
+
+        readfile($arquivo);
+
+        exit;
+    }
+
+    public function buscarHabilidades()
+    {
+
+        header('Content-Type: application/json');
+
+        if (!isset($_SESSION['candidato'])) {
+
+            echo json_encode([
+
+                'sucesso' => false,
+
+                'mensagem' => 'Sessão expirada.'
+
+            ]);
+
+            exit;
+        }
+
+        $idCandidato =
+            $_SESSION['candidato']['id'];
+
+        $habilidades =
+            $this->model->buscarHabilidadesEditar($idCandidato);
+
+        echo json_encode([
+
+            'sucesso' => true,
+
+            'habilidades' => $habilidades
+
+        ]);
+    }
+}
