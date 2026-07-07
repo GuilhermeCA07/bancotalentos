@@ -271,7 +271,7 @@
         <div class="modal-filtro-content modal-email">
 
             <span
-                class="fechar-modal"
+                id="fecharModalEmail"
                 onclick="fecharModalEmail()">
                 &times;
             </span>
@@ -770,14 +770,6 @@
     <div id="modalToken" class="modal-filtro">
 
         <div class="modal-filtro-content modal-token">
-
-            <button
-                type="button"
-                class="btn-fechar-modal"
-                id="fecharmodal-token">
-                &times;
-
-            </button>
 
             <h3>Confirmação de Segurança</h3>
 
@@ -1590,6 +1582,7 @@
 
     }
 
+    /* // Função de fechar o modal do token ao clicar fora | Desabilitada pensando em acidentes de clicargem fora
     window.addEventListener("click", function(e) {
 
         const modal =
@@ -1602,6 +1595,7 @@
         }
 
     });
+    */
 
     let acaoCandidato = "";
 

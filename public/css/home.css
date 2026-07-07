@@ -277,18 +277,50 @@ body {
     position: relative;
 }
 
-.fechar-modal {
+.fechar-modal, #fecharModalEmail {
+
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #dc2626;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all .2s ease;
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, .2);
+    z-index: 10;
+}
+
+.fechar-modal:hover, #fecharModalEmail:hover{
+
+    background: #b91c1c;
+    transform: scale(1.1);
+}
+
+#fecharmodaltoken {
 
     position: absolute;
 
-    top: 15px;
-    right: 15px;
+    top: 12px;
 
-    width: 40px;
-    height: 40px;
+    right: 12px;
+
+    width: 36px;
+
+    height: 36px;
 
     display: flex;
+
     align-items: center;
+
     justify-content: center;
 
     border-radius: 50%;
@@ -297,24 +329,31 @@ body {
 
     color: #fff;
 
-    font-size: 22px;
+    font-size: 26px;
+
     font-weight: bold;
+
+    line-height: 1;
 
     cursor: pointer;
 
-    transition: all .2s ease;
+    transition: .25s ease;
 
     box-shadow:
-        0 4px 10px rgba(0, 0, 0, .2);
+        0 4px 12px rgba(0,0,0,.18);
 
-    z-index: 10;
+    user-select: none;
+
+    z-index: 20;
+
 }
 
-.fechar-modal:hover {
+#fecharmodaltoken:hover{
 
-    background: #b91c1c;
+    background:#b91c1c;
 
-    transform: scale(1.1);
+    transform:scale(1.08) rotate(90deg);
+
 }
 
 .modal-content h2 {
