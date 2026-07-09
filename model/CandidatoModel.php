@@ -16,7 +16,11 @@ class CandidatoModel
         $whatsapp,
         $email,
         $curriculo,
-        $observacoes
+        $observacoes,
+        $escolaridade = null,
+        $estadoCivil = null,
+        $fumante = 0,
+        $cnh = null
     ) {
 
         $sql = "
@@ -28,6 +32,10 @@ class CandidatoModel
             telefone,
             whatsapp,
             email,
+            escolaridade,
+            estado_civil,
+            fumante,
+            cnh,
             curriculo,
             observacoes
 
@@ -36,7 +44,7 @@ class CandidatoModel
         VALUES
         (
 
-            ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 
         )
 
@@ -55,7 +63,7 @@ class CandidatoModel
 
         $comando->bind_param(
 
-            "ssisss",
+            "ssisssisss",
 
             $nome,
 
@@ -64,6 +72,14 @@ class CandidatoModel
             $whatsapp,
 
             $email,
+
+            $escolaridade,
+
+            $estadoCivil,
+
+            $fumante,
+
+            $cnh,
 
             $curriculo,
 
@@ -252,11 +268,98 @@ class CandidatoModel
                 $filtros['status_candidato'];
         }
 
+        if (!empty($filtros['escolaridade'])) {
+
+            $where .= "
+            AND c.escolaridade = ?
+        ";
+
+            $tipos .= "s";
+
+            $valores[] =
+                $filtros['escolaridade'];
+        }
+
+        if (!empty($filtros['estado_civil'])) {
+
+            $where .= "
+            AND c.estado_civil = ?
+        ";
+
+            $tipos .= "s";
+
+            $valores[] =
+                $filtros['estado_civil'];
+        }
+
+        if (
+            isset($filtros['fumante'])
+            &&
+            $filtros['fumante'] !== ''
+        ) {
+
+            $where .= "
+            AND c.fumante = ?
+        ";
+
+            $tipos .= "i";
+
+            $valores[] =
+                (int)$filtros['fumante'];
+        }
+
+        if (!empty($filtros['cnh'])) {
+
+            $where .= "
+            AND c.cnh = ?
+        ";
+
+            $tipos .= "s";
+
+            $valores[] =
+                $filtros['cnh'];
+        }
+
+        /*
+|--------------------------------------------------------------------------
+| Última atualização
+|--------------------------------------------------------------------------
+*/
+
+        if (!empty($filtros['data_inicial'])) {
+
+            $where .= "
+        AND DATE(c.ultima_atualizacao) >= ?
+    ";
+
+            $tipos .= "s";
+
+            $valores[] =
+                $filtros['data_inicial'];
+        }
+
+        if (!empty($filtros['data_final'])) {
+
+            $where .= "
+        AND DATE(c.ultima_atualizacao) <= ?
+    ";
+
+            $tipos .= "s";
+
+            $valores[] =
+                $filtros['data_final'];
+        }
+
         $sql .= $where;
 
         $sql .= "
-        ORDER BY c.nome
-    ";
+        ORDER BY
+
+        c.ultima_atualizacao DESC,
+
+        c.nome ASC
+
+        ";
 
         if (
             $limite !== null
@@ -325,7 +428,11 @@ class CandidatoModel
         $whatsapp,
         $email,
         $curriculo,
-        $observacoes
+        $observacoes,
+        $escolaridade = null,
+        $estadoCivil = null,
+        $fumante = 0,
+        $cnh = null
     ) {
         $sql = "UPDATE candidatos
             SET
@@ -333,6 +440,10 @@ class CandidatoModel
                 telefone = ?,
                 whatsapp = ?,
                 email = ?,
+                escolaridade = ?,
+                estado_civil = ?,
+                fumante = ?,
+                cnh = ?,
                 curriculo = ?,
                 observacoes = ?
             WHERE idCandidato = ?";
@@ -340,11 +451,15 @@ class CandidatoModel
         $comando = $this->conexao->prepare($sql);
 
         $comando->bind_param(
-            "ssisssi",
+            "ssisssisssi",
             $nome,
             $telefone,
             $whatsapp,
             $email,
+            $escolaridade,
+            $estadoCivil,
+            $fumante,
+            $cnh,
             $curriculo,
             $observacoes,
             $id
@@ -367,9 +482,18 @@ class CandidatoModel
 
     function buscarHabilidades($idCandidato)
     {
-        $sql = "SELECT *
-            FROM candidato_habilidade
-            WHERE candidato_id = ?";
+        $sql = "
+            SELECT
+                ch.habilidade_id,
+                ch.nivel,
+                ch.nome_exibicao,
+                h.nome
+            FROM candidato_habilidade ch
+            INNER JOIN habilidades h
+                ON h.idHabilidade = ch.habilidade_id
+            WHERE ch.candidato_id = ?
+            ORDER BY h.nome
+        ";
 
         $comando = $this->conexao->prepare($sql);
 
@@ -382,10 +506,23 @@ class CandidatoModel
 
             while ($linha = $resultado->fetch_assoc()) {
 
+                $nomeExibicao =
+                    !empty($linha['nome_exibicao'])
+                    ? $linha['nome_exibicao']
+                    : $linha['nome'];
+
                 $dados[] = [
                     'id' => $linha['habilidade_id'],
-                    'nivel' => $linha['nivel'],
-                    'nomeExibicao' => $linha['nome_exibicao']
+                    'nivel' => (int)$linha['nivel'],
+                    'nivelHabilidade' => (int)$linha['nivel'],
+                    'nome' => $nomeExibicao,
+                    'nomeOriginal' => $linha['nome'],
+                    'nomeExibicao' => $nomeExibicao,
+                    'descricao' =>
+                    $linha['nome'] === 'Outra Habilidade'
+                        ? $nomeExibicao
+                        : '',
+                    'salva' => true
                 ];
             }
 
@@ -620,6 +757,82 @@ class CandidatoModel
                 $filtros['status_candidato'];
         }
 
+        if (!empty($filtros['escolaridade'])) {
+
+            $where .= "
+            AND c.escolaridade = ?
+        ";
+
+            $tipos .= "s";
+
+            $valores[] =
+                $filtros['escolaridade'];
+        }
+
+        if (!empty($filtros['estado_civil'])) {
+
+            $where .= "
+            AND c.estado_civil = ?
+        ";
+
+            $tipos .= "s";
+
+            $valores[] =
+                $filtros['estado_civil'];
+        }
+
+        if (
+            isset($filtros['fumante'])
+            &&
+            $filtros['fumante'] !== ''
+        ) {
+
+            $where .= "
+            AND c.fumante = ?
+        ";
+
+            $tipos .= "i";
+
+            $valores[] =
+                (int)$filtros['fumante'];
+        }
+
+        if (!empty($filtros['cnh'])) {
+
+            $where .= "
+            AND c.cnh = ?
+        ";
+
+            $tipos .= "s";
+
+            $valores[] =
+                $filtros['cnh'];
+        }
+
+        if (!empty($filtros['data_inicial'])) {
+
+            $where .= "
+        AND DATE(c.ultima_atualizacao) >= ?
+    ";
+
+            $tipos .= "s";
+
+            $valores[] =
+                $filtros['data_inicial'];
+        }
+
+        if (!empty($filtros['data_final'])) {
+
+            $where .= "
+        AND DATE(c.ultima_atualizacao) <= ?
+    ";
+
+            $tipos .= "s";
+
+            $valores[] =
+                $filtros['data_final'];
+        }
+
         $sql .= $where;
 
         $comando =
@@ -788,7 +1001,11 @@ class CandidatoModel
         $email,
         $curriculo,
         $obs,
-        $nome
+        $nome,
+        $escolaridade = null,
+        $estadoCivil = null,
+        $fumante = 0,
+        $cnh = null
     ) {
         $sql = "
         UPDATE candidatos
@@ -802,6 +1019,14 @@ class CandidatoModel
 
         email = ?,
 
+        escolaridade = ?,
+
+        estado_civil = ?,
+
+        fumante = ?,
+
+        cnh = ?,
+
         curriculo = ?,
 
         observacoes = ?
@@ -814,11 +1039,15 @@ class CandidatoModel
             ->prepare($sql);
 
         $comando->bind_param(
-            "ssisssi",
+            "ssisssisssi",
             $nome,
             $telefone,
             $whatsapp,
             $email,
+            $escolaridade,
+            $estadoCivil,
+            $fumante,
+            $cnh,
             $curriculo,
             $obs,
             $idCandidato
@@ -1033,5 +1262,27 @@ class CandidatoModel
         $comando->execute();
 
         return $comando->affected_rows > 0;
+    }
+
+    public function atualizarUltimaAtualizacao($idCandidato)
+    {
+        $sql = "
+
+        UPDATE candidatos
+
+        SET ultima_atualizacao = NOW()
+
+        WHERE idCandidato = ?
+
+    ";
+
+        $comando = $this->conexao->prepare($sql);
+
+        $comando->bind_param(
+            "i",
+            $idCandidato
+        );
+
+        return $comando->execute();
     }
 }

@@ -52,22 +52,34 @@ class Candidato
         $filtros = [
 
             'busca' =>
-            trim(
-                $_GET['busca']
-                    ?? ''
-            ),
+            trim($_GET['busca'] ?? ''),
 
             'status_candidato' =>
-            $_GET['status_candidato']
-                ?? '',
+            $_GET['status_candidato'] ?? '',
+
+            'escolaridade' =>
+            $_GET['escolaridade'] ?? '',
+
+            'estado_civil' =>
+            $_GET['estado_civil'] ?? '',
+
+            'fumante' =>
+            $_GET['fumante'] ?? '',
+
+            'cnh' =>
+            $_GET['cnh'] ?? '',
 
             'categoria' =>
-            $_GET['categoria']
-                ?? '',
+            $_GET['categoria'] ?? '',
 
             'habilidade' =>
-            $_GET['habilidade']
-                ?? '',
+            $_GET['habilidade'] ?? '',
+
+            'data_inicial' =>
+            $_GET['data_inicial'] ?? '',
+
+            'data_final' =>
+            $_GET['data_final'] ?? '',
 
             'pagina' =>
             isset($_GET['pagina'])
@@ -83,7 +95,11 @@ class Candidato
 
         $totalPaginas = ceil($totalRegistros / $registrosPorPagina);
 
-        $paginaAtual = max(1, $filtros['pagina']);
+        $paginaAtual =
+            min(
+                max(1, $filtros['pagina']),
+                max(1, $totalPaginas)
+            );
 
         $offset = ($paginaAtual - 1) * $registrosPorPagina;
 
@@ -146,6 +162,20 @@ class Candidato
 
             $curriculo = $this->salvarCurriculo();
 
+            $escolaridade =
+                trim($_POST['escolaridade'] ?? '');
+
+            $estadoCivil =
+                trim($_POST['estado_civil'] ?? '');
+
+            $fumante =
+                isset($_POST['fumante'])
+                ? 1
+                : 0;
+
+            $cnh =
+                trim($_POST['cnh'] ?? '');
+
 
             if (empty($_POST['idCandidato'])) {
 
@@ -162,7 +192,11 @@ class Candidato
                     $whatsapp,
                     $_POST['email'],
                     $curriculo,
-                    $_POST['observacoes']
+                    $_POST['observacoes'],
+                    $escolaridade,
+                    $estadoCivil,
+                    $fumante,
+                    $cnh
                 );
 
                 $idCandidato = $this->model->buscarUltimoId();
@@ -188,7 +222,11 @@ class Candidato
                     $whatsapp,
                     $_POST['email'],
                     $curriculo,
-                    $_POST['observacoes']
+                    $_POST['observacoes'],
+                    $escolaridade,
+                    $estadoCivil,
+                    $fumante,
+                    $cnh
                 );
 
                 $idCandidato = $_POST['idCandidato'];
@@ -198,20 +236,20 @@ class Candidato
 
             if (isset($_POST['habilidade'])) {
 
-                foreach ($_POST['habilidade'] as $idHabilidade) {
+                foreach ($_POST['habilidade'] as $indice => $idHabilidade) {
 
-                    $nivel = $_POST['nivel'][$idHabilidade] ?? 0;
+                    $nivel = $_POST['nivel'][$indice] ?? 0;
 
                     if (
-                        isset($_POST['descricao_personalizada'][$idHabilidade])
-                        && !empty($_POST['descricao_personalizada'][$idHabilidade])
+                        isset($_POST['descricao_personalizada'][$indice])
+                        && !empty($_POST['descricao_personalizada'][$indice])
                     ) {
                         $descricao =
-                            $_POST['descricao_personalizada'][$idHabilidade];
+                            $_POST['descricao_personalizada'][$indice];
                     }
 
                     $nomeExibicao =
-                        $_POST['nome_exibicao'][$idHabilidade]
+                        $_POST['nome_exibicao'][$indice]
                         ?? '';
 
                     $this->model->salvarHabilidade(
@@ -222,6 +260,11 @@ class Candidato
                     );
                 }
             }
+
+            $this->model
+                ->atualizarUltimaAtualizacao(
+                    $idCandidato
+                );
 
 
             voltarParaRetorno("?c=candidato");

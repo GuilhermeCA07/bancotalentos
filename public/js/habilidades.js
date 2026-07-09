@@ -250,6 +250,12 @@ function renderizarHabilidades() {
     habilidadesSelecionadas.forEach(
         (habilidade, index) => {
 
+            const nivel =
+                habilidade.nivel ??
+                habilidade.nivelHabilidade ??
+                habilidade.nivel_habilidade ??
+                0;
+
             const div =
                 document.createElement("div");
 
@@ -259,7 +265,7 @@ function renderizarHabilidades() {
             div.innerHTML = `
                 <span>
                     ${habilidade.nomeExibicao}
-                    - Nível ${habilidade.nivel}
+                    - Nível ${nivel}
                 </span>
 
                 <button
@@ -282,7 +288,7 @@ function renderizarHabilidades() {
                 <input
                     type="hidden"
                     name="nivel[${index}]"
-                    value="${habilidade.nivel}"
+                    value="${nivel}"
                 >
 
                 <input
@@ -418,3 +424,4 @@ function verificarHabilidadePersonalizada() {
 }
 
 renderizarHabilidades();
+

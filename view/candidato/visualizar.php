@@ -56,7 +56,55 @@
 
         <div class="info-item">
             <span class="label">
-                Observações
+                Escolaridade
+            </span>
+
+            <span>
+                <?= !empty($candidato['escolaridade'])
+                    ? $candidato['escolaridade']
+                    : '-' ?>
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">
+                Estado Civil
+            </span>
+
+            <span>
+                <?= !empty($candidato['estado_civil'])
+                    ? $candidato['estado_civil']
+                    : '-' ?>
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">
+                Fumante
+            </span>
+
+            <span>
+                <?= !empty($candidato['fumante'])
+                    ? 'Sim'
+                    : 'N&atilde;o' ?>
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">
+                CNH
+            </span>
+
+            <span>
+                <?= !empty($candidato['cnh'])
+                    ? $candidato['cnh']
+                    : 'N&atilde;o possui' ?>
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">
+                Observa&ccedil;&otilde;es
             </span>
 
             <span>
@@ -86,6 +134,14 @@
                 $habilidades as $habilidade
             ): ?>
 
+                <?php
+                $nivel =
+                    $habilidade['nivel']
+                    ?? $habilidade['nivelHabilidade']
+                    ?? $habilidade['nivel_habilidade']
+                    ?? '-';
+                ?>
+
                 <div class="habilidade-tag">
 
                     <div>
@@ -95,7 +151,7 @@
                     </div>
 
                     <small>
-                        Nível <?= $habilidade['nivel'] ?>/10
+                        Nível <?= $nivel ?>/10
                     </small>
 
                 </div>

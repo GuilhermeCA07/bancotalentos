@@ -50,6 +50,130 @@
 
             </select>
 
+            <select name="escolaridade">
+
+                <option value="">
+                    Todas as Escolaridades
+                </option>
+
+                <?php foreach ([
+                    'Ensino Fundamental Incompleto',
+                    'Ensino Fundamental Completo',
+                    'Ensino Médio Incompleto',
+                    'Ensino Médio Completo',
+                    'Ensino Superior Incompleto',
+                    'Ensino Superior Completo',
+                    'Pós-graduação'
+                ] as $opcao): ?>
+
+                    <option
+                        value="<?= $opcao ?>"
+                        <?= ($_GET['escolaridade'] ?? '') == $opcao ? 'selected' : '' ?>>
+                        <?= $opcao ?>
+                    </option>
+
+                <?php endforeach; ?>
+
+            </select>
+
+            <select name="estado_civil">
+
+                <option value="">
+                    Todos os Estados Civis
+                </option>
+
+                <?php foreach ([
+                    'Solteiro(a)',
+                    'Casado(a)',
+                    'Divorciado(a)',
+                    'Viúvo(a)',
+                    'União Estável'
+                ] as $opcao): ?>
+
+                    <option
+                        value="<?= $opcao ?>"
+                        <?= ($_GET['estado_civil'] ?? '') == $opcao ? 'selected' : '' ?>>
+                        <?= $opcao ?>
+                    </option>
+
+                <?php endforeach; ?>
+
+            </select>
+
+            <select name="fumante">
+
+                <option value="">
+                    Fumante?
+                </option>
+
+                <option value="1"
+                    <?= ($_GET['fumante'] ?? '') === '1' ? 'selected' : '' ?>>
+                    Sim
+                </option>
+
+                <option value="0"
+                    <?= ($_GET['fumante'] ?? '') === '0' ? 'selected' : '' ?>>
+                    N&atilde;o
+                </option>
+
+            </select>
+
+            <select name="cnh">
+
+                <option value="">
+                    Todas as CNHs
+                </option>
+
+                <?php foreach ([
+                    'A',
+                    'B',
+                    'AB',
+                    'AC',
+                    'AD',
+                    'AE',
+                    'C',
+                    'D',
+                    'E'
+                ] as $opcao): ?>
+
+                    <option
+                        value="<?= $opcao ?>"
+                        <?= ($_GET['cnh'] ?? '') == $opcao ? 'selected' : '' ?>>
+                        <?= $opcao ?>
+                    </option>
+
+                <?php endforeach; ?>
+
+            </select>
+
+            <div class="grupo-filtro">
+
+                <label for="data_inicial">
+                    Atualização de
+                </label>
+
+                <input
+                    type="date"
+                    id="data_inicial"
+                    name="data_inicial"
+                    value="<?= htmlspecialchars($filtros['data_inicial'] ?? '') ?>">
+
+            </div>
+
+            <div class="grupo-filtro">
+
+                <label for="data_final">
+                    até
+                </label>
+
+                <input
+                    type="date"
+                    id="data_final"
+                    name="data_final"
+                    value="<?= htmlspecialchars($filtros['data_final'] ?? '') ?>">
+
+            </div>
+
             <div class="filtros-avancados">
 
                 <button
@@ -86,9 +210,7 @@
                         <button
                             type="button"
                             onclick="fecharCurriculo()">
-
                             ×
-
                         </button>
 
                     </div>
@@ -257,6 +379,7 @@
             <th class="col-telefone">Telefone</th>
             <th>Email</th>
             <th>Status</th>
+            <th>Última Atualização</th>
             <th>Curriculo</th>
             <th class="col-acoes">Ações</th>
         </tr>
@@ -311,6 +434,30 @@
                         <?= $status ?>
 
                     </span>
+
+                </td>
+
+                <td>
+
+                    <?php
+
+                    if (!empty($candidato['ultima_atualizacao'])) {
+
+                        echo date(
+
+                            "d/m/Y",
+
+                            strtotime(
+                                $candidato['ultima_atualizacao']
+                            )
+
+                        );
+                    } else {
+
+                        echo "-";
+                    }
+
+                    ?>
 
                 </td>
 

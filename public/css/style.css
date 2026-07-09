@@ -877,16 +877,70 @@ td.acoes-coluna {
     display: flex;
     align-items: center;
     gap: 10px;
+    min-width: 0;
+    width: 100%;
 }
 
 .form-busca {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    align-items: end;
+    flex-wrap: wrap;
+    gap: 8px;
+    width: 100%;
 }
 
 .form-busca input[type="text"] {
-    width: 320px;
+    flex: 1 1 230px;
+    width: auto;
+    min-width: 210px;
+    max-width: 320px;
+    height: 40px;
+}
+
+.form-busca select {
+    flex: 1 1 135px;
+    min-width: 0;
+    max-width: 210px;
+    height: 40px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.form-busca .grupo-filtro {
+    display: flex;
+    flex: 0 0 130px;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.form-busca .grupo-filtro label {
+    color: #4b5563;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.form-busca input[type="date"] {
+    height: 40px;
+    padding: 8px 9px;
+    border: 1px solid #d9dde3;
+    border-radius: 8px;
+    background: white;
+    font-size: 13px;
+}
+
+.form-busca .filtros-avancados {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 8px;
+    align-items: end;
+}
+
+.form-busca .btn-filtro {
+    min-height: 40px;
+    padding: 9px 12px;
+    white-space: nowrap;
 }
 
 .checkbox-filtro {
@@ -1707,7 +1761,7 @@ td.acoes-coluna {
     font-weight: bold;
 }
 
-.status-candidato.em-analise {
+.status-candidato.em-análise {
 
     background: #fff3cd;
 

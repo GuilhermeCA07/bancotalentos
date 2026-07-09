@@ -254,7 +254,7 @@
                 <button
                     type="button"
                     class="btn-curriculo"
-                    id='btnCurriculoLivre'>
+                    id='btnCurriculoLivre2'>
 
                     <i class="fa-solid fa-file-arrow-up"></i>
                     Deixe seu Currículo
@@ -506,6 +506,158 @@
                 <div class="form-group">
 
                     <label>
+                        Escolaridade
+                    </label>
+
+                    <select
+                        name="escolaridade"
+                        id="escolaridade">
+
+                        <option value="">
+                            Selecione...
+                        </option>
+
+                        <option value="Ensino Fundamental Incompleto">
+                            Ensino Fundamental Incompleto
+                        </option>
+
+                        <option value="Ensino Fundamental Completo">
+                            Ensino Fundamental Completo
+                        </option>
+
+                        <option value="Ensino Médio Incompleto">
+                            Ensino Médio Incompleto
+                        </option>
+
+                        <option value="Ensino Médio Completo">
+                            Ensino Médio Completo
+                        </option>
+
+                        <option value="Ensino Superior Incompleto">
+                            Ensino Superior Incompleto
+                        </option>
+
+                        <option value="Ensino Superior Completo">
+                            Ensino Superior Completo
+                        </option>
+
+                        <option value="Pós-graduação">
+                            Pós-graduação
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        Estado Civil
+                    </label>
+
+                    <select
+                        name="estado_civil"
+                        id="estado_civil">
+
+                        <option value="">
+                            Selecione...
+                        </option>
+
+                        <option value="Solteiro(a)">
+                            Solteiro(a)
+                        </option>
+
+                        <option value="Casado(a)">
+                            Casado(a)
+                        </option>
+
+                        <option value="Divorciado(a)">
+                            Divorciado(a)
+                        </option>
+
+                        <option value="Viúvo(a)">
+                            Viúvo(a)
+                        </option>
+
+                        <option value="União Estável">
+                            União Estável
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group checkbox">
+
+                    <input
+                        type="checkbox"
+                        name="fumante"
+                        id="fumante"
+                        value="1">
+
+                    <label>
+                        Fumante
+                    </label>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
+                        CNH
+                    </label>
+
+                    <select
+                        name="cnh"
+                        id="cnh">
+
+                        <option value="">
+                            Não possui
+                        </option>
+
+                        <option value="A">
+                            A
+                        </option>
+
+                        <option value="B">
+                            B
+                        </option>
+
+                        <option value="AB">
+                            AB
+                        </option>
+
+                        <option value="AC">
+                            AC
+                        </option>
+
+                        <option value="AD">
+                            AD
+                        </option>
+
+                        <option value="AE">
+                            AE
+                        </option>
+
+                        <option value="C">
+                            C
+                        </option>
+
+                        <option value="D">
+                            D
+                        </option>
+
+                        <option value="E">
+                            E
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>
                         Currículo
                     </label>
 
@@ -634,6 +786,13 @@
                         </label>
 
                     </div>
+                    <br>
+                    <div
+                        class="cf-turnstile"
+                        data-sitekey="0x4AAAAAADp1NonOnccCYXZy">
+                    </div>
+                    <br>
+
 
                 </div>
                 <button
@@ -777,6 +936,9 @@
 
                 Enviamos um código de verificação para seu e-mail.
 
+            </p>
+            <p style="color: red">
+                verifique sua caixa de SPAM
             </p>
 
             <div class="token-boxes">
@@ -1064,6 +1226,16 @@
 
     document
         .getElementById("btnCurriculoLivre")
+        ?.addEventListener(
+            "click",
+            function() {
+                iniciarFluxo("livre");
+
+            }
+        );
+
+    document
+        .getElementById("btnCurriculoLivre2")
         ?.addEventListener(
             "click",
             function() {
@@ -1543,6 +1715,18 @@
             ).value =
             candidato.email ?? "";
 
+        document.getElementById("escolaridade").value =
+            candidato.escolaridade ?? "";
+
+        document.getElementById("estado_civil").value =
+            candidato.estado_civil ?? "";
+
+        document.getElementById("fumante").checked =
+            candidato.fumante == 1;
+
+        document.getElementById("cnh").value =
+            candidato.cnh ?? "";
+
         const chkWhatsapp =
             document.getElementById("whatsapp");
 
@@ -1895,5 +2079,9 @@
         );
 </script>
 <script src="public/js/habilidades.js"></script>
-
+<script
+    src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+    async
+    defer>
+</script>
 </html>

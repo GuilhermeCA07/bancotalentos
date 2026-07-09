@@ -4,6 +4,10 @@ $id = $candidato['idCandidato'] ?? '';
 $nome = $candidato['nome'] ?? '';
 $telefone = $candidato['telefone'] ?? '';
 $email = $candidato['email'] ?? '';
+$escolaridade = $candidato['escolaridade'] ?? '';
+$estadoCivil = $candidato['estado_civil'] ?? '';
+$fumante = $candidato['fumante'] ?? 0;
+$cnh = $candidato['cnh'] ?? '';
 $observacoes = $candidato['observacoes'] ?? '';
 $whatsapp = $candidato['whatsapp'] ?? 0;
 
@@ -74,6 +78,119 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
             type="email"
             name="email"
             value="<?= $email ?>">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Escolaridade</label>
+
+                <select name="escolaridade">
+
+                    <option value="">
+                        Selecione...
+                    </option>
+
+                    <?php foreach ([
+                        'Ensino Fundamental Incompleto',
+                        'Ensino Fundamental Completo',
+                        'Ensino Médio Incompleto',
+                        'Ensino Médio Completo',
+                        'Ensino Superior Incompleto',
+                        'Ensino Superior Completo',
+                        'Pós-graduação'
+                    ] as $opcao): ?>
+
+                        <option
+                            value="<?= $opcao ?>"
+                            <?= $escolaridade == $opcao ? 'selected' : '' ?>>
+                            <?= $opcao ?>
+                        </option>
+
+                    <?php endforeach; ?>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Estado Civil</label>
+
+                <select name="estado_civil">
+
+                    <option value="">
+                        Selecione...
+                    </option>
+
+                    <?php foreach ([
+                        'Solteiro(a)',
+                        'Casado(a)',
+                        'Divorciado(a)',
+                        'Viúvo(a)',
+                        'União Estável'
+                    ] as $opcao): ?>
+
+                        <option
+                            value="<?= $opcao ?>"
+                            <?= $estadoCivil == $opcao ? 'selected' : '' ?>>
+                            <?= $opcao ?>
+                        </option>
+
+                    <?php endforeach; ?>
+
+                </select>
+
+            </div>
+
+            <div class="form-group checkbox">
+
+                <input
+                    type="checkbox"
+                    name="fumante"
+                    value="1"
+                    <?= $fumante ? 'checked' : '' ?>>
+
+                <label>Fumante</label>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>CNH</label>
+
+                <select name="cnh">
+
+                    <option value="">
+                        Não possui
+                    </option>
+
+                    <?php foreach ([
+                        'A',
+                        'B',
+                        'AB',
+                        'AC',
+                        'AD',
+                        'AE',
+                        'C',
+                        'D',
+                        'E'
+                    ] as $opcao): ?>
+
+                        <option
+                            value="<?= $opcao ?>"
+                            <?= $cnh == $opcao ? 'selected' : '' ?>>
+                            <?= $opcao ?>
+                        </option>
+
+                    <?php endforeach; ?>
+
+                </select>
+
+            </div>
+
+        </div>
+
         <div class="form-group">
             <br>
             <label>

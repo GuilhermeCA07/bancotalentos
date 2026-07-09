@@ -60,6 +60,14 @@ class Home
 
             'email' => $candidato['email'],
 
+            'escolaridade' => $candidato['escolaridade'],
+
+            'estado_civil' => $candidato['estado_civil'],
+
+            'fumante' => $candidato['fumante'],
+
+            'cnh' => $candidato['cnh'],
+
             'whatsapp' => $candidato['whatsapp'],
 
             'curriculo' => $candidato['curriculo'],
@@ -176,7 +184,7 @@ class Home
 
             exit;
         }
-        /*
+        
         if (!$this->validarTurnstile()) {
 
             $_SESSION['erro'] =
@@ -187,7 +195,7 @@ class Home
             );
 
             exit;
-        }*/
+        }
 
         $nome =
             trim($_POST['nome']);
@@ -201,6 +209,20 @@ class Home
 
         $email =
             trim($_POST['email']);
+
+        $escolaridade =
+            trim($_POST['escolaridade'] ?? '');
+
+        $estadoCivil =
+            trim($_POST['estado_civil'] ?? '');
+
+        $fumante =
+            isset($_POST['fumante'])
+            ? 1
+            : 0;
+
+        $cnh =
+            trim($_POST['cnh'] ?? '');
 
         /*
         |--------------------------------------------------------------------------
@@ -281,7 +303,11 @@ class Home
                     $whatsapp,
                     $email,
                     $curriculo,
-                    $observacoes
+                    $observacoes,
+                    $escolaridade,
+                    $estadoCivil,
+                    $fumante,
+                    $cnh
                 );
 
             $_SESSION['sucesso_candidatura'] =
@@ -352,12 +378,21 @@ class Home
                     $curriculo
                         ?: $candidato['curriculo'],
                     $observacoes,
-                    $nome
+                    $nome,
+                    $escolaridade,
+                    $estadoCivil,
+                    $fumante,
+                    $cnh
 
                 );
 
             $idCandidato =
                 $candidato['idCandidato'];
+
+            $this->candidatoModel
+                ->atualizarUltimaAtualizacao(
+                    $idCandidato
+                );
 
             $_SESSION['candidatura_atualizada'] =
                 "Seus dados foram atualizados e sua candidatura foi registrada com sucesso!";
@@ -436,6 +471,11 @@ class Home
                 }
             }
         }
+
+        $this->candidatoModel
+            ->atualizarUltimaAtualizacao(
+                $idCandidato
+            );
 
         $this->atualizarSessaoCandidato(
             $idCandidato
@@ -541,7 +581,7 @@ class Home
 
             return null;
         }
-        var_dump("MIME OK");
+        
         /*
         * TAMANHO
         */
@@ -554,7 +594,6 @@ class Home
 
             return null;
         }
-        var_dump("TAMANHO OK");
         /*
         * DIRETÓRIO
         */
@@ -570,7 +609,6 @@ class Home
                 true
             );
         }
-        var_dump("DIRETORIO OK");
 
         /*
         * NOME SEGURO
@@ -595,7 +633,6 @@ class Home
             )
         ) {
 
-            var_dump("UPLOAD OK");
             return $destino;
         }
 
@@ -603,7 +640,7 @@ class Home
     }
     public function cadastrarCurriculo()
     {
-        /*
+    
     if (!$this->validarTurnstile()) {
 
         $_SESSION['erro'] =
@@ -612,7 +649,6 @@ class Home
         header("Location:?c=home");
         exit;
     }
-    */
 
         if (!isset($_POST['aceite_lgpd'])) {
 
@@ -635,6 +671,20 @@ class Home
 
         $email =
             trim($_POST['email']);
+
+        $escolaridade =
+            trim($_POST['escolaridade'] ?? '');
+
+        $estadoCivil =
+            trim($_POST['estado_civil'] ?? '');
+
+        $fumante =
+            isset($_POST['fumante'])
+            ? 1
+            : 0;
+
+        $cnh =
+            trim($_POST['cnh'] ?? '');
 
         $observacoes =
             trim($_POST['observacoes'] ?? '');
@@ -732,8 +782,6 @@ class Home
 
                     $idCandidato,
 
-                    $nome,
-
                     $telefone,
 
                     $whatsapp,
@@ -743,8 +791,22 @@ class Home
                     $curriculoNovo
                         ?: $candidato['curriculo'],
 
-                    $observacoes
+                    $observacoes,
 
+                    $nome,
+
+                    $escolaridade,
+
+                    $estadoCivil,
+
+                    $fumante,
+
+                    $cnh
+
+                );
+            $this->candidatoModel
+                ->atualizarUltimaAtualizacao(
+                    $idCandidato
                 );
 
             $_SESSION['curriculo_atualizado'] =
@@ -773,7 +835,15 @@ class Home
 
                     $curriculo,
 
-                    $observacoes
+                    $observacoes,
+
+                    $escolaridade,
+
+                    $estadoCivil,
+
+                    $fumante,
+
+                    $cnh
 
                 );
 
@@ -848,6 +918,11 @@ class Home
                         );
                 }
             }
+
+            $this->candidatoModel
+                ->atualizarUltimaAtualizacao(
+                    $idCandidato
+                );
         }
 
         /*
