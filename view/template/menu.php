@@ -77,6 +77,15 @@
             </li>
         <?php endif; ?>
 
+        <?php if (temPermissao('log')): ?>
+            <li>
+                <a href="?c=log">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    Logs
+                </a>
+            </li>
+        <?php endif; ?>
+
         <?php if (temPermissao('chamada')): ?>
             <li>
                 <a href="?c=chamada">

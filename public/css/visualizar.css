@@ -240,6 +240,51 @@
     margin-bottom: 25px;
 }
 
+@media (max-width: 760px) {
+    .card-visualizacao {
+        border-radius: 10px;
+        margin-bottom: 18px;
+    }
+
+    .card-header {
+        align-items: flex-start;
+        padding: 18px;
+    }
+
+    .card-header h2,
+    .card-header h3 {
+        font-size: 20px;
+    }
+
+    .card-body {
+        padding: 18px;
+    }
+
+    .status-badge {
+        width: 100%;
+        text-align: center;
+    }
+
+    .lista-habilidades {
+        gap: 10px;
+    }
+
+    .habilidade-tag {
+        min-width: 0;
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    .btn-whatsapp {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    .titulo-pagina {
+        font-size: 24px;
+    }
+}
+
 
 
 .modal-curriculo {

@@ -226,3 +226,54 @@
 
     height: 350px;
 }
+
+@media (max-width: 980px) {
+    .dashboard {
+        padding: 0;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-entrevistas,
+    .dashboard-grafico {
+        border-radius: 10px;
+        padding: 18px;
+    }
+
+    .dashboard-table {
+        min-width: 760px;
+    }
+}
+
+@media (max-width: 640px) {
+    .cards-dashboard {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .card-dashboard {
+        padding: 16px;
+        border-radius: 10px;
+    }
+
+    .card-dashboard span {
+        font-size: 26px;
+    }
+
+    .dashboard-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .dashboard-entrevistas,
+    .dashboard-grafico {
+        padding: 14px;
+    }
+
+    .dashboard-grafico {
+        height: 300px;
+    }
+}

@@ -457,6 +457,11 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
             ">
         </iframe>
 
+        <img
+            id="imagemCurriculo"
+            class="imagem-curriculo"
+            alt="Visualização do currículo">
+
         <div class="modal-curriculo-footer">
 
             <a
@@ -487,19 +492,58 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
                 'curriculoMensagem'
             );
 
+        const imagem =
+            document.getElementById(
+                'imagemCurriculo'
+            );
+
+        const extensaoNormalizada =
+            extensao.toLowerCase();
+
+        const url =
+            '?c=candidato&m=visualizarCurriculo&id=' +
+            id;
+
         if (
-            extensao.toLowerCase() ===
+            extensaoNormalizada ===
             'pdf'
         ) {
 
             iframe.style.display =
                 'block';
 
+            imagem.style.display =
+                'none';
+
+            imagem.src = '';
+
             msg.innerHTML = '';
+            msg.style.display = 'none';
 
             iframe.src =
-                '?c=candidato&m=visualizarCurriculo&id=' +
-                id;
+                url;
+
+        } else if (
+            [
+                'jpg',
+                'jpeg',
+                'png'
+            ].includes(extensaoNormalizada)
+        ) {
+
+            iframe.style.display =
+                'none';
+
+            iframe.src = '';
+
+            imagem.style.display =
+                'block';
+
+            imagem.src =
+                url;
+
+            msg.innerHTML = '';
+            msg.style.display = 'none';
 
         } else {
 
@@ -507,6 +551,13 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
                 'none';
 
             iframe.src = '';
+
+            imagem.style.display =
+                'none';
+
+            imagem.src = '';
+
+            msg.style.display = 'flex';
 
             msg.innerHTML =
                 '<p>Visualização disponível apenas para PDF.</p>';
@@ -539,6 +590,12 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
         document
             .getElementById(
                 'iframeCurriculo'
+            )
+            .src = '';
+
+        document
+            .getElementById(
+                'imagemCurriculo'
             )
             .src = '';
     }

@@ -435,16 +435,28 @@ class Candidato
                 )
             );
 
-        if ($extensao !== 'pdf') {
+        $tiposPermitidos = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png'
+        ];
+
+        if (!isset($tiposPermitidos[$extensao])) {
             exit;
         }
 
         header(
-            'Content-Type: application/pdf'
+            'Content-Type: ' .
+                $tiposPermitidos[$extensao]
         );
 
         header(
             'Content-Disposition: inline'
+        );
+
+        header(
+            'X-Content-Type-Options: nosniff'
         );
 
         readfile($arquivo);

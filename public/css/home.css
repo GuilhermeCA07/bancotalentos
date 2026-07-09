@@ -1363,3 +1363,606 @@ input[type="range"]::-moz-range-thumb {
     color:#0F4DB0;
 
 }
+
+/* ==========================================
+   HOME 2026 - REFINO VISUAL E FORMULARIO
+========================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    color: #172033;
+    background:
+        linear-gradient(180deg, #f7fbff 0%, #eef4fb 46%, #f8fafc 100%);
+}
+
+.home-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 16px clamp(18px, 4vw, 56px);
+    background: rgba(255, 255, 255, .86);
+    border-bottom: 1px solid rgba(226, 232, 240, .9);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .08);
+    backdrop-filter: blur(14px);
+}
+
+.home-logo img {
+    height: 54px;
+    display: block;
+}
+
+.btn-admin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 11px 18px;
+    border: 1px solid rgba(15, 77, 176, .18);
+    border-radius: 8px;
+    background: #0f4db0;
+    box-shadow: 0 10px 22px rgba(15, 77, 176, .2);
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.btn-admin:hover {
+    background: #0b3f92;
+    box-shadow: 0 14px 28px rgba(15, 77, 176, .28);
+    transform: translateY(-1px);
+}
+
+.home-hero {
+    position: relative;
+    overflow: hidden;
+    margin: 0;
+    padding: clamp(70px, 9vw, 118px) 20px clamp(58px, 7vw, 90px);
+    background:
+        linear-gradient(135deg, rgba(12, 54, 127, .96), rgba(15, 77, 176, .9)),
+        url("../img/logo.png") center / 360px auto no-repeat;
+    color: #fff;
+    isolation: isolate;
+}
+
+.home-hero::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -1px;
+    width: min(1120px, calc(100% - 32px));
+    height: 1px;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, .28);
+}
+
+.home-hero h1 {
+    max-width: 880px;
+    margin: 0 auto;
+    font-size: clamp(34px, 5vw, 58px);
+    line-height: 1.02;
+    letter-spacing: 0;
+}
+
+.home-hero p {
+    max-width: 640px;
+    margin: 18px auto 0;
+    color: rgba(255, 255, 255, .88);
+    font-size: clamp(16px, 2vw, 20px);
+    line-height: 1.6;
+}
+
+.home-vagas {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: clamp(30px, 5vw, 56px) 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+    gap: 22px;
+}
+
+.vaga-card {
+    border: 1px solid rgba(226, 232, 240, .95);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .94);
+    box-shadow: 0 18px 42px rgba(15, 23, 42, .08);
+}
+
+.vaga-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 50px rgba(15, 23, 42, .13);
+}
+
+.vaga-header {
+    padding: 22px;
+    background:
+        linear-gradient(135deg, #0f4db0, #12346f);
+}
+
+.vaga-header h2 {
+    margin: 14px 0 9px;
+    font-size: 21px;
+    line-height: 1.24;
+}
+
+.vaga-badge {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .16);
+    border: 1px solid rgba(255, 255, 255, .28);
+    color: #fff;
+    letter-spacing: 0;
+}
+
+.vaga-departamento {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, .9);
+}
+
+.vaga-body,
+.vaga-footer {
+    padding: 22px;
+}
+
+.vaga-body p {
+    color: #475569;
+    font-size: 15px;
+}
+
+.btn-candidatar,
+.btn,
+.btn-secundario,
+.btn-detalhes,
+.btn-habilidade,
+.sem-vagas .btn-curriculo {
+    border-radius: 8px;
+    letter-spacing: 0;
+}
+
+.btn-candidatar,
+.btn,
+.btn-secundario {
+    background: #ff6b00;
+    box-shadow: 0 10px 20px rgba(255, 107, 0, .22);
+}
+
+.btn-candidatar:hover,
+.btn:hover,
+.btn-secundario:hover {
+    background: #e25027;
+    transform: translateY(-1px);
+}
+
+.btn-detalhes {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    background: #0f4db0;
+    box-shadow: 0 10px 20px rgba(15, 77, 176, .18);
+    transition: .2s ease;
+}
+
+.btn-detalhes:hover {
+    background: #0b3f92;
+    transform: translateY(-1px);
+}
+
+.sem-vagas {
+    grid-column: 1 / -1;
+    width: min(780px, 100%);
+    margin: 0 auto;
+    border: 1px solid rgba(226, 232, 240, .95);
+    border-radius: 10px;
+    box-shadow: 0 20px 48px rgba(15, 23, 42, .08);
+}
+
+.sem-vagas i {
+    color: #0f4db0;
+}
+
+.modal {
+    padding: 18px;
+    background: rgba(15, 23, 42, .66);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    width: min(920px, 100%);
+    padding: 0;
+    border: 1px solid rgba(226, 232, 240, .95);
+    border-radius: 10px;
+    box-shadow: 0 28px 80px rgba(15, 23, 42, .28);
+}
+
+.modal-content h2,
+.modal-content > h3 {
+    margin: 0;
+}
+
+#modalCandidatura .modal-content {
+    max-width: 980px;
+}
+
+#tituloModal {
+    padding: 24px 30px 18px;
+    color: #0f172a;
+    font-size: 26px;
+    border-bottom: 1px solid #e5e7eb;
+    background:
+        linear-gradient(180deg, #ffffff, #f8fafc);
+}
+
+#formCandidatura {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 18px;
+    padding: 24px 30px 30px;
+}
+
+#formCandidatura #campoVaga,
+#formCandidatura input[type="hidden"],
+#formCandidatura h3,
+#formCandidatura h4,
+#formCandidatura #listaHabilidades,
+#formCandidatura #inputsOcultos,
+#formCandidatura .habilidades-container,
+#formCandidatura .termos-lgpd,
+#formCandidatura #btnEnviar,
+#curriculo-info {
+    grid-column: 1 / -1;
+}
+
+#formCandidatura > br {
+    display: none;
+}
+
+.modal-content .form-group {
+    margin-bottom: 0;
+}
+
+.modal-content label,
+.nivel-header label {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select,
+.form-group select {
+    width: 100%;
+    min-height: 44px;
+    padding: 11px 12px;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    background: #fff;
+    color: #172033;
+    font-size: 15px;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #0f4db0;
+    box-shadow: 0 0 0 4px rgba(15, 77, 176, .12);
+}
+
+.modal-content input[type="file"] {
+    min-height: 52px;
+    padding: 12px;
+    background: #f8fafc;
+    border-style: dashed;
+}
+
+.checkbox,
+.lgpd-container {
+    min-height: 44px;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.checkbox label,
+.lgpd-container label {
+    color: #475569;
+    font-weight: 600;
+}
+
+#formCandidatura h3,
+#formCandidatura h4 {
+    margin: 10px 0 0;
+    color: #0f172a;
+}
+
+.habilidades-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+    align-items: end;
+    padding: 18px;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+}
+
+.habilidades-container .form-group {
+    min-width: 0;
+}
+
+.btn-habilidade-group {
+    min-width: 180px;
+}
+
+.btn-habilidade {
+    width: 100%;
+    min-height: 44px;
+    background: #0f4db0;
+}
+
+.btn-habilidade:hover {
+    background: #0b3f92;
+}
+
+#valorNivel {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #0f4db0;
+}
+
+input[type="range"] {
+    width: 100%;
+}
+
+.habilidade-tag {
+    border-radius: 8px;
+    background: #0f4db0;
+}
+
+.curriculo-alerta {
+    border: 1px solid rgba(15, 77, 176, .16);
+    border-left: 4px solid #0f4db0;
+    border-radius: 8px;
+}
+
+.modal-vaga {
+    width: min(940px, 100%);
+    max-width: 940px;
+    padding: 30px;
+}
+
+.modal-vaga h2 {
+    padding-right: 48px;
+    color: #0f172a;
+    font-size: 28px;
+}
+
+.vaga-info-grid div {
+    border-left: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.vaga-info-grid strong {
+    color: #0f4db0;
+}
+
+.modal-email,
+.modal-token,
+.modal-termos-content {
+    border-radius: 10px;
+    border: 1px solid rgba(226, 232, 240, .95);
+}
+
+.modal-email-icon {
+    border-radius: 10px;
+}
+
+@media (max-width: 900px) {
+    #formCandidatura,
+    .habilidades-container {
+        grid-template-columns: 1fr;
+    }
+
+    #tituloModal {
+        padding: 22px 22px 16px;
+        font-size: 23px;
+    }
+
+    #formCandidatura {
+        padding: 22px;
+    }
+}
+
+@media (max-width: 640px) {
+    .home-header {
+        position: static;
+    }
+
+    .home-hero {
+        padding: 54px 18px 46px;
+    }
+
+    .home-vagas {
+        width: min(100% - 24px, 1180px);
+        padding: 24px 0;
+    }
+
+    .vaga-card,
+    .sem-vagas,
+    .modal-content,
+    .modal-vaga {
+        border-radius: 8px;
+    }
+
+    .modal {
+        align-items: flex-start;
+        padding: 10px;
+    }
+
+    .modal-content,
+    .modal-vaga {
+        width: 100%;
+        max-height: calc(100vh - 20px);
+    }
+
+    .modal-vaga {
+        padding: 22px;
+    }
+
+    #tituloModal {
+        padding-right: 58px;
+    }
+
+    .fechar-modal,
+    .fechar-detalhes,
+    #fecharModalEmail,
+    #fecharmodaltoken,
+    .btn-fechar-termos {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        font-size: 20px;
+    }
+
+    .token-boxes {
+        gap: 7px;
+    }
+
+    .token-input {
+        width: 42px;
+        height: 52px;
+    }
+}
+
+/* Ajustes finos solicitados */
+.home-header {
+    background:
+        linear-gradient(135deg,
+            var(--laranja) 0%,
+            var(--laranjaescuro) 58%,
+            #c83c18 100%);
+    border-bottom: none;
+    box-shadow: 0 12px 26px rgba(226, 80, 39, .22);
+}
+
+.checkbox,
+.lgpd-container {
+    min-height: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+}
+
+.checkbox {
+    align-items: center;
+    gap: 10px;
+}
+
+.lgpd-container {
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.checkbox input,
+.lgpd-container input[type="checkbox"] {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    flex: 0 0 auto;
+}
+
+.lgpd-container input[type="checkbox"] {
+    margin-top: 3px;
+}
+
+.checkbox label,
+.lgpd-container label {
+    margin: 0;
+    color: #475569;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+#valorNivel {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--azul);
+}
+
+input[type="range"] {
+    width: 220px;
+    max-width: 100%;
+    appearance: none;
+    height: 6px;
+    border-radius: 20px;
+    background:
+        linear-gradient(90deg,
+            var(--laranja),
+            var(--laranjaescuro));
+    cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--azul);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--azul);
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    input[type="range"] {
+        width: 100%;
+    }
+}
+
+.fechar-detalhes {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: #dc2626;
+    color: #fff;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all .2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .2);
+    z-index: 10;
+    user-select: none;
+}
+
+.fechar-detalhes:hover {
+    background: #b91c1c;
+    transform: scale(1.06);
+}

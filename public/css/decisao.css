@@ -342,3 +342,60 @@
         0 4px 10px
         rgba(37,211,102,.3);
 }
+
+@media (max-width: 980px) {
+    .tabs-status {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .tabs-status a {
+        flex: 1 1 180px;
+        text-align: center;
+    }
+
+    .decisoes-grid,
+    .detalhe-container,
+    .grid-detalhes {
+        grid-template-columns: 1fr;
+    }
+
+    .decisao-card,
+    .detalhe-card,
+    .card-detalhe {
+        border-radius: 10px;
+    }
+}
+
+@media (max-width: 640px) {
+    .card-topo,
+    .info-item {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .decisao-card,
+    .detalhe-card,
+    .card-body,
+    .card-footer {
+        padding: 16px;
+    }
+
+    .card-header {
+        padding: 14px 16px;
+    }
+
+    .btn-detalhes-decisao,
+    .btn-whatsapp {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .decisao-form input[type="date"],
+    .decisao-form input[type="text"],
+    .decisao-form select {
+        width: 100% !important;
+        min-width: 0;
+    }
+}

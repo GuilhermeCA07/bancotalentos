@@ -455,6 +455,8 @@
                         id="nome"
                         type="text"
                         name="nome"
+                        autocomplete="name"
+                        placeholder="Seu nome completo"
                         required
                         pattern="^[A-Za-zÀ-ÿ\s]{5,100}$">
 
@@ -470,6 +472,8 @@
                         type="text"
                         id="telefone"
                         name="telefone"
+                        autocomplete="tel"
+                        placeholder="(00) 00000-0000"
                         required>
 
                 </div>
@@ -499,6 +503,8 @@
                         type="email"
                         name="email"
                         id="email"
+                        autocomplete="email"
+                        placeholder="email@dominio.com"
                         required>
 
                 </div>
@@ -714,7 +720,8 @@
 
                         <input
                             type="text"
-                            id="descricaoPersonalizada">
+                            id="descricaoPersonalizada"
+                            placeholder="Descreva a habilidade">
 
                     </div>
 

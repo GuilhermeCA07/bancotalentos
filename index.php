@@ -17,6 +17,8 @@ session_set_cookie_params([
 ]);
 
 session_start();
+require_once "helper/LogAtividade.php";
+
 $baseUrl = "https://talentos.netcom.tv.br/index.php";
 $controlador_padrao = 'home';
 $controller = ucfirst($_GET['c'] ?? $controlador_padrao);
@@ -73,6 +75,13 @@ if (file_exists($path_controller)) {
     $id = $_GET['id'] ?? null;
 
     if (is_callable(array($obj, $metodo))) {
+        register_shutdown_function(
+            'registrarAtividadeSistema',
+            $controller,
+            $metodo,
+            $id
+        );
+
         call_user_func_array(array($obj, $metodo), array($id));
     }
 }
