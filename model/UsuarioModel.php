@@ -196,11 +196,12 @@ class UsuarioModel
             nome,
             email,
             senha,
-            perfil
+            perfil,
+            troca_senha_obrigatoria
         )
         VALUES
         (
-            ?, ?, ?, ?
+            ?, ?, ?, ?, 1
         )
     ";
 
@@ -239,7 +240,8 @@ class UsuarioModel
                 nome = ?,
                 email = ?,
                 senha = ?,
-                perfil = ?
+                perfil = ?,
+                troca_senha_obrigatoria = 1
 
             WHERE idUsuario = ?
         ";
@@ -357,6 +359,77 @@ class UsuarioModel
         }
 
         return false;
+    }
+
+    public function alterarSenha($idUsuario, $novaSenha)
+    {
+        $sql = "
+            UPDATE usuarios
+            SET senha = ?,
+                troca_senha_obrigatoria = 0
+            WHERE idUsuario = ?
+        ";
+        $senha = password_hash($novaSenha, PASSWORD_DEFAULT);
+        $comando = $this->conexao->prepare($sql);
+        $comando->bind_param("si", $senha, $idUsuario);
+
+        return $comando->execute();
+    }
+
+    public function ativarDoisFatores(
+        $idUsuario,
+        $segredoCriptografado,
+        $ultimoPeriodo
+    ) {
+        $sql = "
+            UPDATE usuarios
+            SET dois_fatores_ativo = 1,
+                dois_fatores_segredo = ?,
+                dois_fatores_ultimo_periodo = ?
+            WHERE idUsuario = ?
+        ";
+        $comando = $this->conexao->prepare($sql);
+        $comando->bind_param(
+            'sii',
+            $segredoCriptografado,
+            $ultimoPeriodo,
+            $idUsuario
+        );
+
+        return $comando->execute();
+    }
+
+    public function desativarDoisFatores($idUsuario)
+    {
+        $sql = "
+            UPDATE usuarios
+            SET dois_fatores_ativo = 0,
+                dois_fatores_segredo = NULL,
+                dois_fatores_ultimo_periodo = NULL
+            WHERE idUsuario = ?
+        ";
+        $comando = $this->conexao->prepare($sql);
+        $comando->bind_param('i', $idUsuario);
+
+        return $comando->execute();
+    }
+
+    public function registrarPeriodoDoisFatores($idUsuario, $periodo)
+    {
+        $sql = "
+            UPDATE usuarios
+            SET dois_fatores_ultimo_periodo = ?
+            WHERE idUsuario = ?
+            AND dois_fatores_ativo = 1
+            AND (
+                dois_fatores_ultimo_periodo IS NULL
+                OR dois_fatores_ultimo_periodo < ?
+            )
+        ";
+        $comando = $this->conexao->prepare($sql);
+        $comando->bind_param('iii', $periodo, $idUsuario, $periodo);
+
+        return $comando->execute() && $comando->affected_rows === 1;
     }
 
     public function buscarTodosSimples()

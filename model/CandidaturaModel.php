@@ -19,7 +19,7 @@ class CandidaturaModel
             vaga_id,
             status
         )
-        VALUES (?, ?, 'Em Análise')
+        VALUES (?, ?, 'Aguardando Entrevista')
     ";
 
         $comando =
@@ -78,7 +78,8 @@ class CandidaturaModel
 
             END AS status_exibicao,
 
-            c.data_candidatura
+            c.data_candidatura,
+            c.motivo_recusa
 
         FROM candidaturas c
 
@@ -431,7 +432,8 @@ class CandidaturaModel
         UPDATE candidaturas
         SET
             status='Recusado',
-            motivo_recusa=?
+            motivo_recusa=?,
+            data_atualizacao=NOW()
         WHERE idCandidatura=?
     ";
 
@@ -444,6 +446,24 @@ class CandidaturaModel
             $motivo,
             $idCandidatura
         );
+
+        return $comando->execute();
+    }
+
+    public function marcarComoEntrevistado($idCandidatura)
+    {
+        $sql = "
+            UPDATE candidaturas
+            SET
+                status = 'Entrevistado',
+                status_contratacao = NULL,
+                motivo_recusa = NULL,
+                data_atualizacao = NOW()
+            WHERE idCandidatura = ?
+        ";
+
+        $comando = $this->conexao->prepare($sql);
+        $comando->bind_param("i", $idCandidatura);
 
         return $comando->execute();
     }
@@ -780,7 +800,8 @@ class CandidaturaModel
 
         WHERE c.status IN (
             'Aprovado',
-            'Recusado'
+            'Recusado',
+            'Entrevistado'
         )
     ";
 
@@ -879,6 +900,14 @@ class CandidaturaModel
 
                     $sql .= "
                 AND c.status = 'Recusado'
+            ";
+
+                    break;
+
+                case 'Entrevistado':
+
+                    $sql .= "
+                AND c.status = 'Entrevistado'
             ";
 
                     break;
@@ -1012,7 +1041,8 @@ FROM candidaturas c
 
         WHERE c.status IN (
             'Aprovado',
-            'Recusado'
+            'Recusado',
+            'Entrevistado'
         )
     ";
 
@@ -1084,6 +1114,14 @@ FROM candidaturas c
 
                     $sql .= "
                 AND c.status = 'Recusado'
+            ";
+
+                    break;
+
+                case 'Entrevistado':
+
+                    $sql .= "
+                AND c.status = 'Entrevistado'
             ";
 
                     break;
@@ -1223,7 +1261,7 @@ FROM candidaturas c
             cand.whatsapp,
 
             v.titulo,
-            v.departamento,
+            d.nome AS departamento,
             v.cidade,
             v.modalidade,
 
@@ -1241,6 +1279,9 @@ FROM candidaturas c
 
         INNER JOIN vagas v
             ON v.idVaga = c.vaga_id
+
+        INNER JOIN departamentos d
+            ON d.idDepartamento = v.departamento_id
 
         LEFT JOIN entrevistas e
             ON e.candidatura_id = c.idCandidatura
@@ -1269,58 +1310,6 @@ FROM candidaturas c
             ->fetch_assoc();
     }
 
-    /*public function buscarDetalhesDecisao($idCandidatura)
-    {
-        $sql = "
-
-        SELECT
-
-            c.*,
-
-            cand.*,
-
-            v.titulo,
-            v.departamento,
-            v.cidade,
-            v.modalidade,
-
-            e.idEntrevista,
-            e.data_entrevista,
-            e.hora_entrevista,
-            e.responsavel,
-            e.local_entrevista,
-            e.observacoes AS observacoes_entrevista
-
-        FROM candidaturas c
-
-        INNER JOIN candidatos cand
-            ON cand.idCandidato = c.candidato_id
-
-        INNER JOIN vagas v
-            ON v.idVaga = c.vaga_id
-
-        LEFT JOIN entrevistas e
-            ON e.candidatura_id = c.idCandidatura
-
-        WHERE c.idCandidatura = ?
-    ";
-
-        $comando =
-            $this->conexao
-            ->prepare($sql);
-
-        $comando->bind_param(
-            "i",
-            $idCandidatura
-        );
-
-        $comando->execute();
-
-        return $comando
-            ->get_result()
-            ->fetch_assoc();
-    }*/
-
     public function aprovar($idCandidatura)
     {
         $sql = "
@@ -1345,7 +1334,8 @@ FROM candidaturas c
     }
 
     public function encerrarPorFechamentoVaga(
-        $idVaga
+        $idVaga,
+        $status
     ) {
         $sql = "
 
@@ -1353,9 +1343,9 @@ FROM candidaturas c
 
     SET
 
-        status = 'Recusado',
+        status = ?,
 
-        motivo_recusa = ?,
+        motivo_recusa = NULL,
 
         data_atualizacao = NOW()
 
@@ -1363,15 +1353,12 @@ FROM candidaturas c
 
     AND status IN (
 
-        'Em Análise',
+        'Aguardando Entrevista',
 
         'Entrevista Agendada'
 
     )
     ";
-
-        $motivo =
-            'Vaga encerrada por contratação de outro candidato.';
 
         $comando =
             $this->conexao
@@ -1379,7 +1366,7 @@ FROM candidaturas c
 
         $comando->bind_param(
             "si",
-            $motivo,
+            $status,
             $idVaga
         );
 
@@ -1410,5 +1397,126 @@ FROM candidaturas c
             $comando
                 ->get_result()
                 ->fetch_assoc()['total'];
+    }
+
+    public function buscarDetalhesResultadoEntrevista($idCandidatura)
+    {
+        $sql = "
+            SELECT
+                c.idCandidatura,
+                cand.nome AS candidato,
+                v.titulo AS vaga,
+                CASE
+                    WHEN c.status_contratacao = 'Contratado'
+                        THEN 'Contratado'
+                    ELSE c.status
+                END AS resultado,
+                c.motivo_recusa,
+                c.data_contratacao,
+                e.observacoes,
+                CASE
+                    WHEN c.status_contratacao = 'Contratado' THEN COALESCE(
+                        lc.criado_em,
+                        c.data_contratacao,
+                        c.data_atualizacao
+                    )
+                    ELSE COALESCE(
+                        l.criado_em,
+                        c.data_atualizacao,
+                        TIMESTAMP(e.data_entrevista, e.hora_entrevista)
+                    )
+                END AS data_decisao,
+                CASE
+                    WHEN c.status_contratacao = 'Contratado' THEN COALESCE(
+                        NULLIF(lc.usuario_nome, ''),
+                        NULLIF(l.usuario_nome, ''),
+                        NULLIF(e.responsavel, ''),
+                        'Nao identificado'
+                    )
+                    WHEN c.status = 'Entrevistado' THEN COALESCE(
+                        NULLIF(e.responsavel, ''),
+                        NULLIF(l.usuario_nome, ''),
+                        'Não identificado'
+                    )
+                    ELSE COALESCE(
+                        NULLIF(l.usuario_nome, ''),
+                        NULLIF(e.responsavel, ''),
+                        'Não identificado'
+                    )
+                END AS responsavel_decisao,
+                e.data_entrevista,
+                e.hora_entrevista
+            FROM candidaturas c
+            INNER JOIN candidatos cand
+                ON cand.idCandidato = c.candidato_id
+            INNER JOIN vagas v
+                ON v.idVaga = c.vaga_id
+            LEFT JOIN entrevistas e
+                ON e.idEntrevista = (
+                    SELECT e2.idEntrevista
+                    FROM entrevistas e2
+                    WHERE e2.candidatura_id = c.idCandidatura
+                    ORDER BY e2.idEntrevista DESC
+                    LIMIT 1
+                )
+            LEFT JOIN logs_atividade l
+                ON l.idLog = (
+                    SELECT l2.idLog
+                    FROM logs_atividade l2
+                    WHERE l2.modulo = 'Entrevista'
+                    AND l2.metodo = 'salvarFinalizacao'
+                    AND JSON_VALID(l2.dados)
+                    AND JSON_UNQUOTE(
+                        JSON_EXTRACT(l2.dados, '$.post.idEntrevista')
+                    ) = CAST(e.idEntrevista AS CHAR)
+                    AND JSON_UNQUOTE(
+                        JSON_EXTRACT(l2.dados, '$.post.resultado')
+                    ) = c.status
+                    ORDER BY l2.criado_em DESC, l2.idLog DESC
+                    LIMIT 1
+                )
+            LEFT JOIN logs_atividade lc
+                ON lc.idLog = (
+                    SELECT lc2.idLog
+                    FROM logs_atividade lc2
+                    WHERE lc2.modulo = 'Contratacao'
+                    AND lc2.metodo = 'contratar'
+                    AND JSON_VALID(lc2.dados)
+                    AND COALESCE(
+                        JSON_UNQUOTE(
+                            JSON_EXTRACT(lc2.dados, '$.get.id')
+                        ),
+                        JSON_UNQUOTE(
+                            JSON_EXTRACT(lc2.dados, '$.post.idCandidatura')
+                        )
+                    ) = CAST(c.idCandidatura AS CHAR)
+                    ORDER BY lc2.criado_em DESC, lc2.idLog DESC
+                    LIMIT 1
+                )
+                 
+            WHERE c.idCandidatura = ?
+            AND c.status IN ('Recusado', 'Entrevistado', 'Aprovado')
+            LIMIT 1
+        ";
+
+        $comando = $this->conexao->prepare($sql);
+        $comando->bind_param("i", $idCandidatura);
+        $comando->execute();
+
+        return $comando
+            ->get_result()
+            ->fetch_assoc();
+    }
+
+    public function buscarDetalhesRecusa($idCandidatura)
+    {
+        $detalhes = $this->buscarDetalhesResultadoEntrevista(
+            $idCandidatura
+        );
+
+        return $detalhes
+            && $detalhes['resultado'] === 'Recusado'
+            ? $detalhes
+            : null;
     }
 }

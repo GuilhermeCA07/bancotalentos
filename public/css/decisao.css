@@ -273,6 +273,9 @@
     font-size:13px;
 
     font-weight:600;
+
+    background:#e2e8f0;
+    color:#334155;
 }
 
 .badge-status.aprovado{

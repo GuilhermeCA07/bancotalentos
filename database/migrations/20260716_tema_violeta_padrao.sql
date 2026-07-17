@@ -1,0 +1,3 @@
+ALTER TABLE configuracoes
+    MODIFY corPrimaria CHAR(7) NOT NULL DEFAULT '#7C3AED',
+    MODIFY corSecundaria CHAR(7) NOT NULL DEFAULT '#1E1733';

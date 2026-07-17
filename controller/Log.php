@@ -8,22 +8,7 @@ class Log
 
     public function __construct()
     {
-        validarPermissao('log');
-
-        if (
-            ($_SESSION['usuario']['perfil'] ?? '')
-            !== 'Gerente'
-        ) {
-            $_SESSION['erro'] =
-                "Apenas gerentes podem acessar os logs.";
-
-            header(
-                "Location:" .
-                rotaInicial()
-            );
-
-            exit;
-        }
+        validarPermissaoLog();
 
         $this->model =
             new LogModel();
@@ -31,6 +16,14 @@ class Log
 
     public function index()
     {
+        $filtrosEnviados = isset($_GET['filtros']);
+        $dataInicial = $filtrosEnviados
+            ? trim($_GET['data_inicio'] ?? '')
+            : date('Y-m-d');
+        $dataFinal = $filtrosEnviados
+            ? trim($_GET['data_fim'] ?? '')
+            : date('Y-m-d');
+
         $filtros = [
             'busca' =>
             trim($_GET['busca'] ?? ''),
@@ -45,10 +38,10 @@ class Log
             $_GET['acao'] ?? '',
 
             'data_inicio' =>
-            $_GET['data_inicio'] ?? '',
+            $dataInicial,
 
             'data_fim' =>
-            $_GET['data_fim'] ?? '',
+            $dataFinal,
 
             'pagina' =>
             isset($_GET['pagina'])

@@ -1,3 +1,8 @@
+<?php
+require_once 'model/ConfiguracaoModel.php';
+$configuracaoSistema =
+    (new ConfiguracaoModel())->buscar();
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -9,31 +14,48 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-    <title>
-        Banco de Talentos - Login
-    </title>
+    <title>Banco de Talentos <?= htmlspecialchars($configuracaoSistema['nomeMarca']) ?> - Login</title>
 
-    <link rel="stylesheet" href="public/css/style.css">
-    <link rel="stylesheet" href="public/css/login.css">
+    <link
+        rel="stylesheet"
+        href="public/css/style.css?v=<?= filemtime('public/css/style.css') ?>">
+    <link
+        rel="stylesheet"
+        href="public/css/login.css?v=<?= filemtime('public/css/login.css') ?>">
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --laranja: <?= htmlspecialchars($configuracaoSistema['corSecundaria']) ?>;
+            --laranjaescuro: <?= htmlspecialchars($configuracaoSistema['corSecundariaEscura']) ?>;
+            --azul: <?= htmlspecialchars($configuracaoSistema['corDestaque']) ?>;
+            --tema-primaria: <?= htmlspecialchars($configuracaoSistema['corPrimaria']) ?>;
+            --tema-destaque-escura: <?= htmlspecialchars($configuracaoSistema['corDestaqueEscura']) ?>;
+        }
+    </style>
+    <link
+        rel="icon"
+        type="<?= htmlspecialchars($configuracaoSistema['tipoIconeMarca']) ?>"
+        href="<?= htmlspecialchars($configuracaoSistema['iconeMarca']) ?>">
 
 </head>
 
-<body class="login-body">
+<body class="login-body marca-<?= htmlspecialchars($configuracaoSistema['identidade']) ?>">
 
     <div class="login-container">
 
         <div class="login-card">
 
             <div class="login-header">
-                <div class="img">
-                    <img src="public/img/logo.png" alt="logo netcom">
+                <div class="login-marca-fundo">
+                    <img
+                        src="<?= htmlspecialchars($configuracaoSistema['iconeMarca']) ?>"
+                        alt="<?= htmlspecialchars($configuracaoSistema['nomeMarca']) ?>">
                 </div>
 
                 <h1>
-                    Banco de Talentos
+                    Banco de Talentos <?= htmlspecialchars($configuracaoSistema['nomeMarca']) ?>
                 </h1>
 
                 <p>
@@ -46,7 +68,7 @@
 
                 <div class="alerta-erro">
 
-                    <?= $_SESSION['erro']; ?>
+                    <?= htmlspecialchars($_SESSION['erro']) ?>
 
                 </div>
 
@@ -105,6 +127,15 @@
 
                 </div>
 
+                <div class="turnstile-login">
+                    <div
+                        class="cf-turnstile"
+                        data-sitekey="<?= htmlspecialchars($turnstileSiteKey) ?>"
+                        data-action="login"
+                        data-theme="light">
+                    </div>
+                </div>
+
                 <button
                     type="submit"
                     class="btn-login">
@@ -161,6 +192,11 @@
             }
         }
 
+    </script>
+    <script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+        async
+        defer>
     </script>
 
 </body>

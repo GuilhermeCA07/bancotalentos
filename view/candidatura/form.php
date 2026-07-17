@@ -23,6 +23,8 @@
             value="<?= $candidatura['idCandidatura'] ?? '' ?>"
         >
 
+        <div class="form-grid">
+
         <div class="form-group">
 
             <label>
@@ -87,13 +89,15 @@
 
         </div>
 
-        <button
-            type="submit"
-            class="btn"
-        >
-            <i class="fa-solid fa-floppy-disk"></i>
-            Salvar
-        </button>
+        </div>
+
+        <div class="form-actions">
+            <a class="btn-secundario" href="?c=candidatura">Cancelar</a>
+            <button type="submit" class="btn">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Salvar candidatura
+            </button>
+        </div>
 
     </form>
 

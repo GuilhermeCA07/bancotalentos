@@ -1,6 +1,6 @@
 <div class="topo">
 
-    <h1>Vagas</h1>
+    <h1>Usuários</h1>
 
     <a
         href="?c=usuario&m=add"
@@ -38,6 +38,12 @@
 
                 <option value="">
                     Todos os Perfis
+                </option>
+
+                <option
+                    value="Administrador"
+                    <?= ($_GET['perfil'] ?? '') == 'Administrador' ? 'selected' : '' ?>>
+                    Administrador
                 </option>
 
                 <option
@@ -92,13 +98,13 @@
 
                     <td>
 
-                        <?= $u['nome'] ?>
+                        <?= htmlspecialchars($u['nome']) ?>
 
                     </td>
 
                     <td>
 
-                        <?= $u['email'] ?>
+                        <?= htmlspecialchars($u['email']) ?>
 
                     </td>
 
@@ -109,7 +115,7 @@
     <?= strtolower($u['perfil']) ?>
 ">
 
-                            <?= $u['perfil'] ?>
+                            <?= htmlspecialchars($u['perfil']) ?>
 
                         </span>
 
@@ -134,15 +140,22 @@
 
                             <div class="dropdown-menu">
 
-                                <a
-                                    href="?c=usuario&m=editar&id=<?= $u['idUsuario'] ?>">
+                                <?php if (
+                                    $u['perfil'] !== 'Administrador'
+                                    || ehAdministrador()
+                                ): ?>
+                                    <a
+                                        href="?c=usuario&m=editar&id=<?= $u['idUsuario'] ?>">
 
-                                    <i class="fa-solid fa-pen"></i>
+                                        <i class="fa-solid fa-pen"></i>
 
-                                    Editar
+                                        Editar
 
-                                </a>
+                                    </a>
+                                <?php endif; ?>
 
+
+<?php if (podeExcluir()): ?>
                                 <a
                                     href="?c=usuario&m=excluir&id=<?= $u['idUsuario'] ?>"
                                     onclick="return confirm('Deseja excluir este usuário?')">
@@ -152,6 +165,7 @@
                                     Excluir
 
                                 </a>
+<?php endif; ?>
 
                             </div>
 

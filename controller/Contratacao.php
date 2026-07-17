@@ -109,7 +109,11 @@ class Contratacao
 
             $this->vagaModel->fecharVaga($idVaga);
 
-            $this->candidaturaModel->encerrarPorFechamentoVaga($idVaga);
+            $this->candidaturaModel
+                ->encerrarPorFechamentoVaga(
+                    $idVaga,
+                    'Vaga Preenchida por Contratação'
+                );
         }
 
         voltarParaRetorno("Location:?c=contratacao");
@@ -150,5 +154,39 @@ class Contratacao
             );
 
         voltarParaRetorno("Location:?c=contratacao");
+    }
+
+    public function detalhesResultado($id)
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $idCandidatura = (int)$id;
+
+        if ($idCandidatura <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'sucesso' => false,
+                'mensagem' => 'Candidatura invalida.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $detalhes = $this->candidaturaModel
+            ->buscarDetalhesResultadoEntrevista($idCandidatura);
+
+        if (!$detalhes) {
+            http_response_code(404);
+            echo json_encode([
+                'sucesso' => false,
+                'mensagem' => 'Detalhes da entrevista nao encontrados.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        echo json_encode([
+            'sucesso' => true,
+            'dados' => $detalhes
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 }

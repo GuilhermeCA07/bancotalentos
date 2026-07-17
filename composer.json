@@ -1,5 +1,7 @@
 {
     "require": {
-        "phpmailer/phpmailer": "^7.1"
+        "phpmailer/phpmailer": "^7.1",
+        "pragmarx/google2fa": "^9.0",
+        "bacon/bacon-qr-code": "^2.0"
     }
 }

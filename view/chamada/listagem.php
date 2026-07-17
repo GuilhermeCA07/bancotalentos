@@ -1,38 +1,40 @@
-<div class="page-header">
-
-    <h1>
-        Chamadas WhatsApp
-    </h1>
-    <br>
+<div class="topo">
+    <div>
+        <span class="pagina-eyebrow">Comunicação</span>
+        <h1>Chamadas WhatsApp</h1>
+    </div>
 </div>
 
 <div class="toolbar">
-    <div class="busca-container">
-
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <form method="GET" class="form-busca">
+        <form method="GET" class="form-busca painel-filtros">
 
             <input
                 type="hidden"
                 name="c"
                 value="chamada">
 
-            <input
-                type="text"
-                name="busca"
-                value="<?= $_GET['busca'] ?? '' ?>"
-                placeholder="Nome, vaga ou telefone">
+            <div class="campo-filtro campo-filtro-busca">
+                <label for="buscaChamada">Buscar</label>
+                <div class="entrada-com-icone">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input id="buscaChamada" type="text" name="busca"
+                        value="<?= htmlspecialchars($_GET['busca'] ?? '') ?>"
+                        placeholder="Nome, vaga ou telefone">
+                </div>
+            </div>
 
-            <select name="status">
+            <div class="campo-filtro campo-filtro-status">
+                <label for="statusChamada">Status</label>
+                <select id="statusChamada" name="status">
 
                 <option value="">
                     Todos
                 </option>
 
                 <option
-                    value="Em Análise"
-                    <?= ($_GET['status'] ?? '') == 'Em Análise' ? 'selected' : '' ?>>
-                    Em Análise
+                    value="Aguardando Entrevista"
+                    <?= ($_GET['status'] ?? '') == 'Aguardando Entrevista' ? 'selected' : '' ?>>
+                    Aguardando Entrevista
                 </option>
 
                 <option
@@ -54,6 +56,12 @@
                 </option>
 
                 <option
+                    value="Entrevistado"
+                    <?= ($_GET['status'] ?? '') == 'Entrevistado' ? 'selected' : '' ?>>
+                    Entrevistado
+                </option>
+
+                <option
                     value="Contratado"
                     <?= ($_GET['status'] ?? '') == 'Contratado' ? 'selected' : '' ?>>
                     Contratado
@@ -71,30 +79,28 @@
                     Auto-Dispensa
                 </option>
 
-            </select>
+                </select>
+            </div>
 
-            <label class="checkbox-filtro">
+            <div class="campo-filtro campo-filtro-checkbox">
+                <span class="campo-filtro-label">Disponibilidade</span>
+                <label class="checkbox-filtro">
+                    <input
+                        type="checkbox"
+                        name="sem_whatsapp"
+                        value="1"
+                        <?= isset($_GET['sem_whatsapp']) ? 'checked' : '' ?>>
+                    <span class="checkbox-indicador" aria-hidden="true"></span>
+                    <span>Sem WhatsApp</span>
+                </label>
+            </div>
 
-                <input
-                    type="checkbox"
-                    name="sem_whatsapp"
-                    value="1"
-                    <?= isset($_GET['sem_whatsapp'])
-                        ? 'checked'
-                        : '' ?>>
-
-                <span>
-                    Sem WhatsApp
-                </span>
-
-            </label>
-
-            <button class="btn">
-                Buscar
+            <button class="btn btn-filtrar">
+                <i class="fa-solid fa-filter" aria-hidden="true"></i>
+                Filtrar
             </button>
 
         </form>
-    </div>
 </div>
 
 <div class="card">
@@ -134,7 +140,13 @@
                 <tr>
 
                     <td>
-                        <?= $c['nome'] ?>
+                        <a
+                            class="link-candidato"
+                            href="?c=chamada&amp;m=visualizarCandidato&amp;id=<?= (int)$c['candidato_id'] ?>"
+                            title="Abrir perfil do candidato">
+                            <i class="fa-solid fa-user" aria-hidden="true"></i>
+                            <?= htmlspecialchars($c['nome']) ?>
+                        </a>
                     </td>
 
                     <td>
@@ -146,19 +158,34 @@
                     </td>
 
                     <td>
+                        <?php
+                        $statusExibicao = $c['status_exibicao'];
+                        $classeStatus = strtolower(
+                            str_replace(' ', '-', $statusExibicao)
+                        );
+                        $possuiDetalhes = in_array(
+                            $statusExibicao,
+                            ['Recusado', 'Entrevistado', 'Aprovado', 'Contratado'],
+                            true
+                        );
+                        ?>
 
-                        <span class="
-                                badge-status
-                                <?= strtolower(
-                                    str_replace(
-                                        ' ',
-                                        '-',
-                                        $c['status_exibicao']
-                                    )
-                                ) ?>
-                            ">
-                            <?= $c['status_exibicao'] ?>
-                        </span>
+                        <?php if ($possuiDetalhes): ?>
+                            <button
+                                type="button"
+                                class="badge-status badge-detalhes-interativo <?= htmlspecialchars($classeStatus) ?>"
+                                data-detalhes-id="<?= (int)$c['idCandidatura'] ?>"
+                                data-detalhes-endpoint="?c=chamada&amp;m=detalhesResultado"
+                                data-resultado="<?= htmlspecialchars($statusExibicao) ?>"
+                                title="Ver detalhes da entrevista">
+                                <?= htmlspecialchars($statusExibicao) ?>
+                                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                            </button>
+                        <?php else: ?>
+                            <span class="badge-status <?= htmlspecialchars($classeStatus) ?>">
+                                <?= htmlspecialchars($statusExibicao) ?>
+                            </span>
+                        <?php endif; ?>
                     </td>
                     <td>
 
@@ -228,3 +255,8 @@
 
 
     </table>
+
+</div>
+
+<?php include "view/candidatura/modal_recusa.php"; ?>
+<script src="public/js/recusa-modal.js?v=<?= filemtime('public/js/recusa-modal.js') ?>"></script>

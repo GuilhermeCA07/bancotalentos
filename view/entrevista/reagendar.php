@@ -1,14 +1,17 @@
-<h2>
-    Reagendar Entrevista
-</h2>
-<br>
+<div class="topo">
+    <div>
+        <span class="pagina-eyebrow">Agenda</span>
+        <h1>Reagendar Entrevista</h1>
+    </div>
+</div>
 
-
-
+<div class="form-card">
 <form
     method="POST"
     action="?c=entrevista&m=salvarReagendamento"
     id="formReagendamento">
+
+    <div class="form-grid form-grid-3">
 
     <div class="form-group">
 
@@ -57,8 +60,6 @@
 
     </div>
 
-
-
     <div class="form-group">
 
         <label>
@@ -75,6 +76,10 @@
                     ) ?>">
 
     </div>
+
+    </div>
+
+    <div class="form-grid">
 
     <div class="form-group">
 
@@ -112,6 +117,8 @@
 
     </div>
 
+    </div>
+
     <div class="form-group">
 
         <label>
@@ -125,16 +132,16 @@
 
     </div>
 
-    <button
-        type="submit"
-        class="btn">
-        <i class="fa-solid fa-calendar-check"></i>
-
-        Reagendar
-
-    </button>
+    <div class="form-actions">
+        <a class="btn-secundario" href="?c=entrevista">Cancelar</a>
+        <button type="submit" class="btn">
+            <i class="fa-solid fa-calendar-check"></i>
+            Reagendar
+        </button>
+    </div>
 
 </form>
+</div>
 <script>
 
 function gerarHorariosReagendamento() {

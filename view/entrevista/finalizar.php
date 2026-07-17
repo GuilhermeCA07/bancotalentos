@@ -37,13 +37,15 @@
 
         <div class="form-group">
 
-            <label>
+            <label id="rotuloObservacoes" for="observacoesEntrevista">
                 Observações
             </label>
 
             <textarea
+                id="observacoesEntrevista"
                 name="observacoes"
-                rows="6"></textarea>
+                rows="6"
+                placeholder="Registre as observações da entrevista..."></textarea>
 
         </div>
 
@@ -70,6 +72,10 @@
                     Recusado
                 </option>
 
+                <option value="Entrevistado">
+                    Entrevistado
+                </option>
+
             </select>
 
         </div>
@@ -84,6 +90,7 @@
             </label>
 
             <textarea
+                id="motivoRecusa"
                 name="motivo_recusa"
                 rows="5"
                 placeholder="Descreva o motivo da recusa..."></textarea>
@@ -106,19 +113,54 @@
             "resultado"
         );
 
-    resultado.addEventListener(
-    "change",
-    function() {
+    const blocoRecusa =
+        document.getElementById(
+            "blocoRecusa"
+        );
 
-        document
-            .getElementById(
-                "blocoRecusa"
-            )
-            .style.display =
-            this.value === "Recusado"
+    const motivoRecusa =
+        document.getElementById(
+            "motivoRecusa"
+        );
+
+    const observacoesEntrevista =
+        document.getElementById(
+            "observacoesEntrevista"
+        );
+
+    const rotuloObservacoes =
+        document.getElementById(
+            "rotuloObservacoes"
+        );
+
+    function atualizarMotivoRecusa() {
+        const recusado =
+            resultado.value === "Recusado";
+
+        blocoRecusa.style.display =
+            recusado
             ? "block"
             : "none";
 
+        motivoRecusa.required =
+            recusado;
+
+        const entrevistado =
+            resultado.value === "Entrevistado";
+
+        observacoesEntrevista.required =
+            entrevistado;
+
+        rotuloObservacoes.textContent =
+            entrevistado
+            ? "Observações da entrevista *"
+            : "Observações";
     }
-);
+
+    resultado.addEventListener(
+        "change",
+        atualizarMotivoRecusa
+    );
+
+    atualizarMotivoRecusa();
 </script>

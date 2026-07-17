@@ -66,6 +66,8 @@ class ChamadaModel
 
         c.idCandidatura,
 
+        cand.idCandidato AS candidato_id,
+
         c.status,
 
         c.status_contratacao,

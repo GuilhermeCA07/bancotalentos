@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 288" role="img" aria-labelledby="title description">
+  <title id="title">Banco de Talentos</title>
+  <desc id="description">Icone padrao do sistema de recrutamento</desc>
+  <path fill="#172554" d="M160 36h192c26.51 0 48 21.49 48 48v120c0 26.51-21.49 48-48 48H160c-26.51 0-48-21.49-48-48V84c0-26.51 21.49-48 48-48Z"/>
+  <path fill="#14B8A6" d="M214 72h84c11.05 0 20 8.95 20 20v12h-28v-4H222v4h-28V92c0-11.05 8.95-20 20-20Z"/>
+  <path fill="#FFFFFF" d="M176 108h160c13.25 0 24 10.75 24 24v68c0 13.25-10.75 24-24 24H176c-13.25 0-24-10.75-24-24v-68c0-13.25 10.75-24 24-24Z"/>
+  <circle cx="256" cy="150" r="25" fill="#14B8A6"/>
+  <path fill="#172554" d="M210 208c5.31-25.16 23.13-39 46-39s40.69 13.84 46 39h-92Z"/>
+  <path fill="#F59E0B" d="m340 62 5.7 11.55 12.75 1.85-9.22 8.99 2.18 12.7L340 91.1l-11.41 5.99 2.18-12.7-9.22-8.99 12.75-1.85L340 62Z"/>
+</svg>

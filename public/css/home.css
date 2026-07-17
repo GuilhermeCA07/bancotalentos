@@ -30,8 +30,8 @@ body {
 .btn-admin {
     text-decoration: none;
     background: linear-gradient(135deg,
-            #003b7a,
-            #0056b3);
+            var(--azul),
+            color-mix(in srgb, var(--azul), #000 18%));
     color: #fff;
     padding: 10px 20px;
     border-radius: 8px;
@@ -42,8 +42,8 @@ body {
     text-align: center;
     padding: 80px 20px;
     background: linear-gradient(135deg,
-            #003b7a,
-            #0056b3);
+            var(--azul),
+            color-mix(in srgb, var(--azul), #000 18%));
     color: white;
 }
 
@@ -74,14 +74,14 @@ body {
 }
 
 .home-card h2 {
-    color: #003b7a;
+    color: var(--azul);
 }
 
 .departamento {
     display: inline-block;
     background: linear-gradient(135deg,
-            #003b7a,
-            #0056b3);
+            var(--azul),
+            color-mix(in srgb, var(--azul), #000 18%));
     color: white;
     padding: 5px 10px;
     border-radius: 6px;
@@ -93,8 +93,8 @@ body {
     padding: 12px;
     border: none;
     background: linear-gradient(135deg,
-            #003b7a,
-            #0056b3);
+            var(--azul),
+            color-mix(in srgb, var(--azul), #000 18%));
     color: white;
     border-radius: 8px;
     cursor: pointer;
@@ -1421,8 +1421,10 @@ body {
     margin: 0;
     padding: clamp(70px, 9vw, 118px) 20px clamp(58px, 7vw, 90px);
     background:
-        linear-gradient(135deg, rgba(12, 54, 127, .96), rgba(15, 77, 176, .9)),
-        url("../img/logo.png") center / 360px auto no-repeat;
+        linear-gradient(135deg,
+            var(--tema-destaque-overlay),
+            var(--tema-destaque-escura-overlay)),
+        var(--marca-icone) center / 360px auto no-repeat;
     color: #fff;
     isolation: isolate;
 }
@@ -1849,11 +1851,93 @@ input[type="range"] {
 .home-header {
     background:
         linear-gradient(135deg,
-            var(--laranja) 0%,
-            var(--laranjaescuro) 58%,
-            #c83c18 100%);
+            var(--tema-secundaria) 0%,
+            var(--tema-secundaria-escura) 100%);
     border-bottom: none;
-    box-shadow: 0 12px 26px rgba(226, 80, 39, .22);
+    box-shadow: 0 12px 26px rgba(15, 23, 42, .2);
+}
+
+.home-logo a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 62px;
+    padding: 4px 10px;
+    border: 1px solid rgba(255, 255, 255, .22);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, .14);
+}
+
+.home-logo img {
+    width: auto;
+    max-width: min(240px, 48vw);
+    height: 54px;
+    object-fit: contain;
+}
+
+.btn-admin,
+.btn-detalhes,
+.btn-candidatar,
+.btn,
+.btn-secundario,
+.btn-habilidade,
+.sem-vagas .btn-curriculo {
+    background: var(--tema-destaque);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, .18);
+}
+
+.btn-admin:hover,
+.btn-detalhes:hover,
+.btn-candidatar:hover,
+.btn:hover,
+.btn-secundario:hover,
+.btn-habilidade:hover,
+.sem-vagas .btn-curriculo:hover {
+    background: var(--tema-destaque-escura);
+}
+
+.home-hero {
+    background:
+        linear-gradient(135deg,
+            var(--tema-destaque-overlay),
+            var(--tema-destaque-escura-overlay)),
+        var(--marca-icone) center / min(360px, 70vw) auto no-repeat;
+}
+
+.marca-netaki .home-logo a {
+    border-color: rgba(255, 255, 255, .72);
+    background: rgba(255, 255, 255, .94);
+}
+
+.marca-sumernet .home-header {
+    border-bottom: 3px solid #E2B725;
+}
+
+.marca-sumernet .home-logo a {
+    border-color: rgba(244, 212, 84, .72);
+}
+
+.marca-sumernet .btn-admin,
+.marca-sumernet .btn-detalhes {
+    background: linear-gradient(135deg, #E2B725, #B78E0F);
+    color: #172033;
+}
+
+.marca-sumernet .btn-admin:hover,
+.marca-sumernet .btn-detalhes:hover {
+    background: linear-gradient(135deg, #F0CA3A, #A77F08);
+}
+
+.marca-sumernet .vaga-badge {
+    border-color: rgba(244, 212, 84, .7);
+    background: rgba(226, 183, 37, .22);
+    color: #FFF8D6;
+}
+
+.vaga-header {
+    background:
+        linear-gradient(135deg,
+            var(--tema-destaque),
+            var(--tema-destaque-escura));
 }
 
 .checkbox,

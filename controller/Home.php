@@ -1,10 +1,12 @@
 <?php
+require_once "helper/Linkedin.php";
+require_once "helper/Turnstile.php";
 
 require "model/VagaModel.php";
 require "model/CandidatoModel.php";
 require "model/CandidaturaModel.php";
 require "model/HabilidadeModel.php";
-require "config/config.php";
+require_once "config/config.php";
 require_once "model/CandidatoTokenModel.php";
 require_once "helper/Mail.php";
 
@@ -60,6 +62,8 @@ class Home
 
             'email' => $candidato['email'],
 
+            'linkedin' => $candidato['linkedin'] ?? null,
+
             'escolaridade' => $candidato['escolaridade'],
 
             'estado_civil' => $candidato['estado_civil'],
@@ -93,63 +97,27 @@ class Home
         include "view/home/index.php";
     }
 
+    private function validarLinkedinFormulario()
+    {
+        try {
+            return normalizarLinkedin(
+                $_POST['linkedin'] ?? ''
+            );
+        } catch (InvalidArgumentException $erro) {
+            $_SESSION['erro'] =
+                $erro->getMessage();
+
+            header('Location:?c=home');
+            exit;
+        }
+    }
+
     private function validarTurnstile()
     {
-        $token =
-            $_POST['cf-turnstile-response']
-            ?? '';
-
-        if (empty($token)) {
-
-            return false;
-        }
-
-        $secret = TURNSTILE_SECRET;
-
-        $dados =
-            http_build_query([
-
-                'secret' => $secret,
-
-                'response' => $token
-
-            ]);
-
-        $contexto =
-            stream_context_create([
-
-                'http' => [
-
-                    'method'  => 'POST',
-
-                    'header'  =>
-                    "Content-type: application/x-www-form-urlencoded",
-
-                    'content' => $dados
-
-                ]
-
-            ]);
-
-        $resultado =
-            file_get_contents(
-
-                'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-
-                false,
-
-                $contexto
-
-            );
-
-        $json =
-            json_decode(
-                $resultado,
-                true
-            );
-
-        return
-            !empty($json['success']);
+        return Turnstile::validar(
+            $_POST['cf-turnstile-response'] ?? '',
+            'candidatura'
+        );
     }
 
     public function candidatar()
@@ -209,6 +177,9 @@ class Home
 
         $email =
             trim($_POST['email']);
+
+        $linkedin =
+            $this->validarLinkedinFormulario();
 
         $escolaridade =
             trim($_POST['escolaridade'] ?? '');
@@ -307,7 +278,8 @@ class Home
                     $escolaridade,
                     $estadoCivil,
                     $fumante,
-                    $cnh
+                    $cnh,
+                    $linkedin
                 );
 
             $_SESSION['sucesso_candidatura'] =
@@ -382,7 +354,8 @@ class Home
                     $escolaridade,
                     $estadoCivil,
                     $fumante,
-                    $cnh
+                    $cnh,
+                    $linkedin
 
                 );
 
@@ -672,6 +645,9 @@ class Home
         $email =
             trim($_POST['email']);
 
+        $linkedin =
+            $this->validarLinkedinFormulario();
+
         $escolaridade =
             trim($_POST['escolaridade'] ?? '');
 
@@ -801,7 +777,9 @@ class Home
 
                     $fumante,
 
-                    $cnh
+                    $cnh,
+
+                    $linkedin
 
                 );
             $this->candidatoModel
@@ -843,7 +821,9 @@ class Home
 
                     $fumante,
 
-                    $cnh
+                    $cnh,
+
+                    $linkedin
 
                 );
 
@@ -1017,7 +997,7 @@ class Home
         );
 
 
-        if (!$enviado) {
+        if ($enviado !== true) {
 
             echo json_encode([
 

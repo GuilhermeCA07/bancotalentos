@@ -5,6 +5,53 @@ class CandidatoModel
 {
     private $conexao;
 
+    private function expressaoStatusExibicao()
+    {
+        return "
+            COALESCE(
+                (
+                    SELECT CASE
+                        WHEN cs.status_contratacao = 'Contratado'
+                            THEN 'Contratado'
+                        WHEN cs.status_contratacao = 'Dispensado'
+                            THEN 'Dispensado'
+                        WHEN cs.status_contratacao = 'Auto-Dispensa'
+                            THEN 'Auto-Dispensa'
+                        ELSE cs.status
+                    END
+                    FROM candidaturas cs
+                    WHERE cs.candidato_id = c.idCandidato
+                    ORDER BY
+                        COALESCE(
+                            cs.data_atualizacao,
+                            cs.data_candidatura
+                        ) DESC,
+                        cs.idCandidatura DESC
+                    LIMIT 1
+                ),
+                c.status_candidato
+            )
+        ";
+    }
+
+    private function expressaoUltimaCandidaturaId()
+    {
+        return "
+            (
+                SELECT cs.idCandidatura
+                FROM candidaturas cs
+                WHERE cs.candidato_id = c.idCandidato
+                ORDER BY
+                    COALESCE(
+                        cs.data_atualizacao,
+                        cs.data_candidatura
+                    ) DESC,
+                    cs.idCandidatura DESC
+                LIMIT 1
+            )
+        ";
+    }
+
     function __construct()
     {
         $this->conexao = Conexao::getConnection();
@@ -20,7 +67,8 @@ class CandidatoModel
         $escolaridade = null,
         $estadoCivil = null,
         $fumante = 0,
-        $cnh = null
+        $cnh = null,
+        $linkedin = null
     ) {
 
         $sql = "
@@ -37,14 +85,15 @@ class CandidatoModel
             fumante,
             cnh,
             curriculo,
-            observacoes
+            observacoes,
+            linkedin
 
         )
 
         VALUES
         (
 
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 
         )
 
@@ -63,7 +112,7 @@ class CandidatoModel
 
         $comando->bind_param(
 
-            "ssisssisss",
+            "ssisssissss",
 
             $nome,
 
@@ -83,7 +132,9 @@ class CandidatoModel
 
             $curriculo,
 
-            $observacoes
+            $observacoes,
+
+            $linkedin
 
         );
 
@@ -103,8 +154,17 @@ class CandidatoModel
         $offset = null
     ) {
 
+        $statusExibicao =
+            $this->expressaoStatusExibicao();
+
+        $idCandidaturaStatus =
+            $this->expressaoUltimaCandidaturaId();
+
         $sql = "
-        SELECT DISTINCT c.*
+        SELECT DISTINCT
+            c.*,
+            $statusExibicao AS status_exibicao,
+            $idCandidaturaStatus AS id_candidatura_status
         FROM candidatos c
     ";
 
@@ -259,7 +319,7 @@ class CandidatoModel
         if (!empty($filtros['status_candidato'])) {
 
             $where .= "
-            AND c.status_candidato = ?
+            AND $statusExibicao = ?
         ";
 
             $tipos .= "s";
@@ -432,7 +492,8 @@ class CandidatoModel
         $escolaridade = null,
         $estadoCivil = null,
         $fumante = 0,
-        $cnh = null
+        $cnh = null,
+        $linkedin = null
     ) {
         $sql = "UPDATE candidatos
             SET
@@ -445,13 +506,14 @@ class CandidatoModel
                 fumante = ?,
                 cnh = ?,
                 curriculo = ?,
-                observacoes = ?
+                observacoes = ?,
+                linkedin = ?
             WHERE idCandidato = ?";
 
         $comando = $this->conexao->prepare($sql);
 
         $comando->bind_param(
-            "ssisssisssi",
+            "ssisssissssi",
             $nome,
             $telefone,
             $whatsapp,
@@ -462,6 +524,7 @@ class CandidatoModel
             $cnh,
             $curriculo,
             $observacoes,
+            $linkedin,
             $id
         );
 
@@ -589,6 +652,9 @@ class CandidatoModel
     public function contarRegistros(
         $filtros = []
     ) {
+
+        $statusExibicao =
+            $this->expressaoStatusExibicao();
 
         $sql = "
         SELECT COUNT(
@@ -748,7 +814,7 @@ class CandidatoModel
         if (!empty($filtros['status_candidato'])) {
 
             $where .= "
-            AND c.status_candidato = ?
+            AND $statusExibicao = ?
         ";
 
             $tipos .= "s";
@@ -1005,7 +1071,8 @@ class CandidatoModel
         $escolaridade = null,
         $estadoCivil = null,
         $fumante = 0,
-        $cnh = null
+        $cnh = null,
+        $linkedin = null
     ) {
         $sql = "
         UPDATE candidatos
@@ -1029,7 +1096,9 @@ class CandidatoModel
 
         curriculo = ?,
 
-        observacoes = ?
+        observacoes = ?,
+
+        linkedin = ?
 
         WHERE idCandidato = ?
     ";
@@ -1039,7 +1108,7 @@ class CandidatoModel
             ->prepare($sql);
 
         $comando->bind_param(
-            "ssisssisssi",
+            "ssisssissssi",
             $nome,
             $telefone,
             $whatsapp,
@@ -1050,6 +1119,7 @@ class CandidatoModel
             $cnh,
             $curriculo,
             $obs,
+            $linkedin,
             $idCandidato
         );
 

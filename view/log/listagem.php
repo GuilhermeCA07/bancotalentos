@@ -18,6 +18,10 @@
                 type="hidden"
                 name="c"
                 value="log">
+            <input
+                type="hidden"
+                name="filtros"
+                value="1">
 
             <input
                 type="text"
@@ -39,9 +43,12 @@
                     'Candidatura',
                     'Categoria',
                     'Chamada',
+                    'Configuracao',
+                    'ConfiguracaoEmail',
                     'Contratacao',
                     'Dashboard',
                     'Decisao',
+                    'Departamento',
                     'Entrevista',
                     'Habilidade',
                     'Usuario',
@@ -61,19 +68,25 @@
                 <option value="">Todas as acoes</option>
 
                 <?php foreach ([
-                    'Acesso',
+                    'Adicao',
+                    'Edicao',
+                    'Busca/Filtro',
                     'Acao',
-                    'Cadastro/Atualizacao',
-                    'Atualizacao',
                     'Exclusao',
                     'Login',
-                    'Logout'
+                    'Logout',
+                    'Contratacao',
+                    'Dispensa',
+                    'Teste',
+                    'Reenvio',
+                    'Cadastro/Atualizacao',
+                    'Atualizacao'
                 ] as $acao): ?>
 
                     <option
                         value="<?= $acao ?>"
                         <?= ($_GET['acao'] ?? '') == $acao ? 'selected' : '' ?>>
-                        <?= $acao ?>
+                        <?= htmlspecialchars(rotuloAcaoLog($acao)) ?>
                     </option>
 
                 <?php endforeach; ?>
@@ -88,7 +101,7 @@
                     type="date"
                     id="data_inicio"
                     name="data_inicio"
-                    value="<?= htmlspecialchars($_GET['data_inicio'] ?? '') ?>">
+                    value="<?= htmlspecialchars($filtros['data_inicio']) ?>">
             </div>
 
             <div class="grupo-filtro">
@@ -100,7 +113,7 @@
                     type="date"
                     id="data_fim"
                     name="data_fim"
-                    value="<?= htmlspecialchars($_GET['data_fim'] ?? '') ?>">
+                    value="<?= htmlspecialchars($filtros['data_fim']) ?>">
             </div>
 
             <button
@@ -161,7 +174,7 @@
                                 $log['acao']
                             )
                         ) ?>">
-                            <?= htmlspecialchars($log['acao']) ?>
+                            <?= htmlspecialchars(rotuloAcaoLog($log['acao'])) ?>
                         </span>
                     </td>
 

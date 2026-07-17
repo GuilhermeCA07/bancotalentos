@@ -5,7 +5,8 @@
     <a
         href="?c=vaga&m=add"
         class="btn">
-        + Nova Vaga
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        Nova Vaga
     </a>
 
 </div>
@@ -15,56 +16,32 @@
 
         <i class="fa-solid fa-magnifying-glass"></i>
 
-        <form method="GET" class="form-busca">
+        <form method="GET" class="form-busca painel-filtros painel-filtros-vagas">
 
             <input type="hidden" name="c" value="vaga">
 
             <input
                 type="text"
                 name="busca"
-                value="<?= $_GET['busca'] ?? '' ?>"
+                value="<?= htmlspecialchars($_GET['busca'] ?? '') ?>"
                 placeholder="Título, cidade, escala...">
 
-            <select name="departamento">
+            <select name="departamento_id">
 
                 <option value="">
                     Todos os departamentos
                 </option>
 
-                <option value="NOC"
-                    <?= ($_GET['departamento'] ?? '') == 'NOC' ? 'selected' : '' ?>>
-                    NOC
-                </option>
-
-                <option value="Financeiro"
-                    <?= ($_GET['departamento'] ?? '') == 'Financeiro' ? 'selected' : '' ?>>
-                    Financeiro
-                </option>
-
-                <option value="Comercial/Atendimento"
-                    <?= ($_GET['departamento'] ?? '') == 'Comercial/Atendimento' ? 'selected' : '' ?>>
-                    Comercial/Atendimento
-                </option>
-
-                <option value="Suporte Técnico"
-                    <?= ($_GET['departamento'] ?? '') == 'Suporte Técnico' ? 'selected' : '' ?>>
-                    Suporte Técnico
-                </option>
-
-                <option value="Infra"
-                    <?= ($_GET['departamento'] ?? '') == 'Infra' ? 'selected' : '' ?>>
-                    Infra
-                </option>
-
-                <option value="Técnico de Rua"
-                    <?= ($_GET['departamento'] ?? '') == 'Técnico de Rua' ? 'selected' : '' ?>>
-                    Técnico de Rua
-                </option>
-
-                <option value="Outros"
-                    <?= ($_GET['departamento'] ?? '') == 'Outros' ? 'selected' : '' ?>>
-                    Outros
-                </option>
+                <?php foreach ($departamentos as $departamento): ?>
+                    <option
+                        value="<?= (int)$departamento['idDepartamento'] ?>"
+                        <?= (int)($_GET['departamento_id'] ?? 0)
+                            === (int)$departamento['idDepartamento']
+                            ? 'selected'
+                            : '' ?>>
+                        <?= htmlspecialchars($departamento['nome']) ?>
+                    </option>
+                <?php endforeach; ?>
 
             </select>
 
@@ -92,7 +69,8 @@
             </select>
 
             <button type="submit" class="btn">
-                Buscar
+                <i class="fa-solid fa-filter" aria-hidden="true"></i>
+                Filtrar
             </button>
 
         </form>
@@ -130,13 +108,8 @@
                 <td>
                     <span
                         class="badge-departamento"
-                        style="
-        background:
-        <?= corDepartamento(
-                $vaga['departamento']
-            ) ?>;
-    ">
-                        <?= $vaga['departamento'] ?>
+                        style="background:<?= htmlspecialchars($vaga['departamento_cor']) ?>">
+                        <?= htmlspecialchars($vaga['departamento']) ?>
                     </span>
                 </td>
 
@@ -251,6 +224,8 @@
 
                                 </a>
 
+
+<?php if (podeExcluir()): ?>
                                 <a
                                     href="?c=vaga&m=excluir&id=<?= $vaga['idVaga'] ?>"
                                     class="btn-action btn-excluir"
@@ -260,6 +235,7 @@
                                     Excluir
 
                                 </a>
+<?php endif; ?>
 
                             </div>
 

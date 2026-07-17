@@ -8,9 +8,25 @@ function temPermissao($modulo)
 
     $permissoes = [
 
-        'Gerente' => [
+        'Administrador' => [
 
             '*'
+
+        ],
+
+        'Gerente' => [
+
+            'dashboard',
+            'candidato',
+            'candidatura',
+            'entrevista',
+            'vaga',
+            'chamada',
+            'decisao',
+            'contratacao',
+            'categoria',
+            'habilidade',
+            'departamento'
 
         ],
 
@@ -59,6 +75,9 @@ function rotaInicial()
 
     switch ($perfil) {
 
+        case 'Administrador':
+            return '?c=dashboard';
+
         case 'Gerente':
             return '?c=dashboard';
 
@@ -70,6 +89,125 @@ function rotaInicial()
 
         default:
             return '?c=home';
+    }
+}
+
+function ehAdministrador()
+{
+    return (
+        $_SESSION['usuario']['perfil']
+        ?? ''
+    ) === 'Administrador';
+}
+
+function ehGerente()
+{
+    return (
+        $_SESSION['usuario']['perfil']
+        ?? ''
+    ) === 'Gerente';
+}
+
+function podeVisualizarEntrevistasFinalizadas()
+{
+    return ehAdministrador() || ehGerente();
+}
+
+function podeExcluir()
+{
+    return ehAdministrador();
+}
+
+function validarPermissaoExclusao()
+{
+    validarSessao();
+
+    if (!podeExcluir()) {
+        $_SESSION['erro'] =
+            'Voce nao possui permissao para excluir registros.';
+
+        header(
+            'Location:' .
+            rotaInicial()
+        );
+
+        exit;
+    }
+}
+
+function podeAcessarLog()
+{
+    return podeExcluir();
+}
+
+function validarPermissaoLog()
+{
+    validarSessao();
+
+    if (!podeAcessarLog()) {
+        $_SESSION['erro'] =
+            'Voce nao possui permissao para acessar os logs.';
+
+        header(
+            'Location:' .
+            rotaInicial()
+        );
+
+        exit;
+    }
+}
+
+function podeAcessarTema()
+{
+    return podeExcluir();
+}
+
+function podeConfigurarEmail()
+{
+    return ehAdministrador();
+}
+
+function podeGerenciarDepartamentos()
+{
+    return ehAdministrador() || ehGerente();
+}
+
+function validarPermissaoDepartamento()
+{
+    validarSessao();
+
+    if (!podeGerenciarDepartamentos()) {
+        $_SESSION['erro'] =
+            'Apenas administradores e gerentes podem acessar departamentos.';
+
+        header('Location:' . rotaInicial());
+        exit;
+    }
+}
+
+function validarPermissaoConfiguracaoEmail()
+{
+    validarSessao();
+
+    if (!podeConfigurarEmail()) {
+        $_SESSION['erro'] =
+            'Apenas administradores podem configurar o e-mail de token.';
+
+        header('Location:' . rotaInicial());
+        exit;
+    }
+}
+
+function validarPermissaoTema()
+{
+    validarSessao();
+
+    if (!podeAcessarTema()) {
+        $_SESSION['erro'] =
+            'Voce nao possui permissao para alterar a aparencia.';
+
+        header('Location:' . rotaInicial());
+        exit;
     }
 }
 
@@ -113,6 +251,26 @@ function validarSessao()
         exit;
     }
 
+    sincronizarPerfilSessao();
+
+    $metodoAtual = (string)($_GET['m'] ?? 'index');
+    $controllerAtual = strtolower((string)($_GET['c'] ?? ''));
+
+    if (
+        !empty($_SESSION['usuario']['troca_senha_obrigatoria'])
+        && !(
+            $controllerAtual === 'usuario'
+            && in_array(
+                $metodoAtual,
+                ['primeiroAcesso', 'alterarMinhaSenha', 'sair'],
+                true
+            )
+        )
+    ) {
+        header('Location:?c=usuario&m=primeiroAcesso');
+        exit;
+    }
+
     if (
         isset($_SESSION['ultimo_acesso']) &&
         (time() - $_SESSION['ultimo_acesso']) > $tempoMaximo
@@ -129,4 +287,42 @@ function validarSessao()
     }
 
     $_SESSION['ultimo_acesso'] = time();
+}
+
+function sincronizarPerfilSessao()
+{
+    $idUsuario = (int)(
+        $_SESSION['usuario']['idUsuario']
+        ?? 0
+    );
+
+    if ($idUsuario <= 0) {
+        return;
+    }
+
+    require_once __DIR__ . '/../config/Conexao.php';
+
+    $conexao = Conexao::getConnection();
+    $comando = $conexao->prepare(
+        'SELECT perfil, troca_senha_obrigatoria, dois_fatores_ativo
+         FROM usuarios
+         WHERE idUsuario = ?
+         LIMIT 1'
+    );
+    $comando->bind_param('i', $idUsuario);
+    $comando->execute();
+    $usuario = $comando->get_result()->fetch_assoc();
+
+    if (!$usuario) {
+        session_unset();
+        session_destroy();
+        header('Location:?c=usuario&m=login');
+        exit;
+    }
+
+    $_SESSION['usuario']['perfil'] = $usuario['perfil'];
+    $_SESSION['usuario']['troca_senha_obrigatoria'] =
+        (int)($usuario['troca_senha_obrigatoria'] ?? 0);
+    $_SESSION['usuario']['dois_fatores_ativo'] =
+        (int)($usuario['dois_fatores_ativo'] ?? 0);
 }

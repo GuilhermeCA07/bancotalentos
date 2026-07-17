@@ -42,35 +42,23 @@
                 </label>
 
                 <select
-                    name="departamento"
+                    name="departamento_id"
                     required>
 
                     <option value="">
                         Selecione
                     </option>
 
-                    <?php
-
-                    $departamentos = [
-                        "NOC",
-                        "Financeiro",
-                        "Comercial/Atendimento",
-                        "Suporte Técnico",
-                        "Infra",
-                        "Técnico de Rua",
-                        "Outros"
-                    ];
-
-                    foreach ($departamentos as $departamento):
-
-                    ?>
+                    <?php foreach ($departamentos as $departamento): ?>
 
                         <option
-                            value="<?= $departamento ?>"
-                            <?= (($vaga['departamento'] ?? '') == $departamento)
+                            value="<?= (int)$departamento['idDepartamento'] ?>"
+                            <?= ((int)($vaga['departamento_id'] ?? 0)
+                                === (int)$departamento['idDepartamento'])
                                 ? 'selected'
                                 : '' ?>>
-                            <?= $departamento ?>
+                            <?= htmlspecialchars($departamento['nome']) ?>
+                            <?= !$departamento['ativo'] ? ' (inativo)' : '' ?>
                         </option>
 
                     <?php endforeach; ?>

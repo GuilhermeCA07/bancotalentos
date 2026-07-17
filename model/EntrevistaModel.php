@@ -61,7 +61,13 @@ class EntrevistaModel
 
             cand.nome AS candidato,
 
-            v.titulo AS vaga
+            v.titulo AS vaga,
+
+            CASE
+                WHEN c.status_contratacao = 'Contratado'
+                    THEN 'Contratado'
+                ELSE c.status
+            END AS status
 
         FROM entrevistas e
 
@@ -75,12 +81,25 @@ class EntrevistaModel
             ON v.idVaga = c.vaga_id
 
         WHERE 1 = 1
-
-        AND c.status = 'Entrevista Agendada'
     ";
 
         $tipos = "";
         $valores = [];
+
+        if (!empty($filtros['incluir_finalizadas'])) {
+            $sql .= "
+                AND c.status IN (
+                    'Entrevista Agendada',
+                    'Aprovado',
+                    'Recusado',
+                    'Entrevistado'
+                )
+            ";
+        } else {
+            $sql .= "
+                AND c.status = 'Entrevista Agendada'
+            ";
+        }
 
         if (!empty($filtros['busca'])) {
 
@@ -395,13 +414,26 @@ WHERE e.idEntrevista = ?
             ON v.idVaga = c.vaga_id
 
         WHERE 1 = 1
-
-        AND c.status = 'Entrevista Agendada'
     ";
 
         $tipos = "";
 
         $valores = [];
+
+        if (!empty($filtros['incluir_finalizadas'])) {
+            $sql .= "
+                AND c.status IN (
+                    'Entrevista Agendada',
+                    'Aprovado',
+                    'Recusado',
+                    'Entrevistado'
+                )
+            ";
+        } else {
+            $sql .= "
+                AND c.status = 'Entrevista Agendada'
+            ";
+        }
 
         if (!empty($filtros['busca'])) {
 

@@ -1,6 +1,7 @@
 <link
     rel="stylesheet"
     href="public/css/visualizar.css">
+<?php $controladorCurriculo = $controladorCurriculo ?? 'candidato'; ?>
 <h1 class="titulo-pagina">
     Perfil do Candidato
 </h1>
@@ -51,6 +52,26 @@
                 <?= $candidato['whatsapp']
                     ? 'Sim'
                     : 'Não' ?>
+            </span>
+        </div>
+
+        <div class="info-item">
+            <span class="label">
+                LinkedIn
+            </span>
+
+            <span>
+                <?php if (!empty($candidato['linkedin'])): ?>
+                    <a
+                        href="<?= htmlspecialchars($candidato['linkedin']) ?>"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        Abrir perfil
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                <?php else: ?>
+                    -
+                <?php endif; ?>
             </span>
         </div>
 
@@ -286,7 +307,7 @@
             extensao.toLowerCase();
 
         const url =
-            '?c=candidato&m=visualizarCurriculo&id=' +
+            '?c=<?= htmlspecialchars($controladorCurriculo) ?>&m=visualizarCurriculo&id=' +
             id;
 
         if (
@@ -353,7 +374,7 @@
                 'btnDownloadCurriculo'
             )
             .href =
-            '?c=candidato&m=baixarCurriculo&id=' +
+            '?c=<?= htmlspecialchars($controladorCurriculo) ?>&m=baixarCurriculo&id=' +
             id;
 
         document

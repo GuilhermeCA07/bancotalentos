@@ -20,11 +20,14 @@ class Entrevista
         $this->candidaturaModel =
             new CandidaturaModel();
         $this->usuarioModel = new UsuarioModel();
+        $this->candidatoModel = new CandidatoModel();
     }
 
     function index()
     {
 
+        $podeVisualizarFinalizadas =
+            podeVisualizarEntrevistasFinalizadas();
 
         $filtros = [
 
@@ -45,6 +48,10 @@ class Entrevista
 
             'hora_fim' =>
             $_GET['hora_fim'] ?? '',
+
+            'incluir_finalizadas' =>
+            $podeVisualizarFinalizadas
+            && ($_GET['incluir_finalizadas'] ?? '') === '1',
 
             'pagina' =>
             isset($_GET['pagina'])
@@ -171,6 +178,12 @@ class Entrevista
                         $_POST['candidatura_id'],
                         'Entrevista Agendada'
                     );
+
+                $this->candidatoModel
+                    ->atualizarStatus(
+                        $candidatura['candidato_id'],
+                        'Entrevista Agendada'
+                    );
             } else {
 
                 $this->model->atualizar(
@@ -209,7 +222,8 @@ class Entrevista
     }
 
     function excluir($id)
-    {
+    {
+        validarPermissaoExclusao();
         $this->model->excluir($id);
 
         voltarParaRetorno(
@@ -233,9 +247,6 @@ class Entrevista
 
     function salvarFinalizacao()
     {
-
-
-
         if (
             !isset($_POST['idEntrevista'])
         ) {
@@ -243,17 +254,74 @@ class Entrevista
         }
 
         $resultado =
-            $_POST['resultado'];
+            $_POST['resultado']
+            ?? '';
 
-        $observacoes =
-            $_POST['observacoes'];
+        $observacoes = trim(
+            $_POST['observacoes']
+            ?? ''
+        );
 
         $motivoRecusa =
-            $_POST['motivo_recusa']
-            ?? null;
+            trim(
+                $_POST['motivo_recusa']
+                ?? ''
+            );
 
-        $idEntrevista =
+        $idEntrevista = (int)
             $_POST['idEntrevista'];
+
+        $resultadosPermitidos = [
+            'Aprovado',
+            'Recusado',
+            'Entrevistado'
+        ];
+
+        if (!in_array(
+            $resultado,
+            $resultadosPermitidos,
+            true
+        )) {
+            $_SESSION['erro'] =
+                'Selecione um resultado válido.';
+
+            header(
+                'Location: ?c=entrevista&m=finalizar&id=' .
+                urlencode($idEntrevista)
+            );
+
+            exit;
+        }
+
+        if (
+            $resultado === 'Recusado'
+            && $motivoRecusa === ''
+        ) {
+            $_SESSION['erro'] =
+                'Informe o motivo da recusa.';
+
+            header(
+                'Location: ?c=entrevista&m=finalizar&id=' .
+                urlencode($idEntrevista)
+            );
+
+            exit;
+        }
+
+        if (
+            $resultado === 'Entrevistado'
+            && $observacoes === ''
+        ) {
+            $_SESSION['erro'] =
+                'Informe as observações da entrevista.';
+
+            header(
+                'Location: ?c=entrevista&m=finalizar&id=' .
+                urlencode($idEntrevista)
+            );
+
+            exit;
+        }
 
         $entrevista =
             $this->model
@@ -261,23 +329,55 @@ class Entrevista
                 $idEntrevista
             );
 
+        if (!$entrevista) {
+            $_SESSION['erro'] =
+                'Entrevista não encontrada.';
+
+            voltarParaRetorno(
+                'Location: ?c=entrevista'
+            );
+
+            exit;
+        }
+
         $this->model->salvarObservacoes(
             $idEntrevista,
             $observacoes
         );
 
-        if (
-            $resultado == 'Aprovado'
-        ) {
+        if ($resultado === 'Aprovado') {
             $this->candidaturaModel
                 ->aprovar(
                     $entrevista['idCandidatura']
                 );
-        } else {
+
+            $this->candidatoModel
+                ->atualizarStatus(
+                    $entrevista['candidato_id'],
+                    'Aprovado'
+                );
+        } elseif ($resultado === 'Recusado') {
             $this->candidaturaModel
                 ->recusar(
                     $entrevista['idCandidatura'],
                     $motivoRecusa
+                );
+
+            $this->candidatoModel
+                ->atualizarStatus(
+                    $entrevista['candidato_id'],
+                    'Recusado'
+                );
+        } else {
+            $this->candidaturaModel
+                ->marcarComoEntrevistado(
+                    $entrevista['idCandidatura']
+                );
+
+            $this->candidatoModel
+                ->atualizarStatus(
+                    $entrevista['candidato_id'],
+                    'Entrevistado'
                 );
         }
 
@@ -335,6 +435,12 @@ class Entrevista
             exit;
         }
 
+        $usuarioReagendamento = trim(
+            $_SESSION['usuario']['nome']
+                ?? $_SESSION['usuario']['email']
+                ?? 'Usuário não identificado'
+        );
+
         $this->model
             ->salvarHistorico(
 
@@ -350,7 +456,7 @@ class Entrevista
 
                 $_POST['motivo'],
 
-                'Sistema'
+                $usuarioReagendamento
 
             );
 
@@ -397,6 +503,40 @@ class Entrevista
         echo json_encode(
             $ocupados
         );
+    }
+
+    public function detalhesResultado($id)
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $idCandidatura = (int)$id;
+
+        if ($idCandidatura <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'sucesso' => false,
+                'mensagem' => 'Candidatura invalida.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $detalhes = $this->candidaturaModel
+            ->buscarDetalhesResultadoEntrevista($idCandidatura);
+
+        if (!$detalhes) {
+            http_response_code(404);
+            echo json_encode([
+                'sucesso' => false,
+                'mensagem' => 'Detalhes da entrevista nao encontrados.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        echo json_encode([
+            'sucesso' => true,
+            'dados' => $detalhes
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
     public function historico()

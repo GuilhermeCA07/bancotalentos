@@ -1,3 +1,8 @@
+<?php
+require_once 'model/ConfiguracaoModel.php';
+$configuracaoSistema =
+    (new ConfiguracaoModel())->buscar();
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -6,31 +11,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>
-        Banco de Talentos Netcom
-    </title>
+    <title>Banco de Talentos <?= htmlspecialchars($configuracaoSistema['nomeMarca']) ?></title>
 
     <link
         rel="stylesheet"
-        href="public/css/home.css">
+        href="public/css/home.css?v=<?= filemtime('public/css/home.css') ?>">
 
     <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link rel="icon" type="image/png" sizes="16x16" href="public/img/icon_logo.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="public/img/icon_logo.png">
+    <link
+        rel="icon"
+        type="<?= htmlspecialchars($configuracaoSistema['tipoIconeMarca']) ?>"
+        href="<?= htmlspecialchars($configuracaoSistema['iconeMarca']) ?>">
+    <style>
+        :root {
+            --laranja: <?= htmlspecialchars($configuracaoSistema['corSecundaria']) ?>;
+            --laranjaescuro: <?= htmlspecialchars($configuracaoSistema['corSecundariaEscura']) ?>;
+            --azul: <?= htmlspecialchars($configuracaoSistema['corDestaque']) ?>;
+            --tema-primaria: <?= htmlspecialchars($configuracaoSistema['corPrimaria']) ?>;
+            --tema-secundaria: <?= htmlspecialchars($configuracaoSistema['corSecundaria']) ?>;
+            --tema-secundaria-escura: <?= htmlspecialchars($configuracaoSistema['corSecundariaEscura']) ?>;
+            --tema-destaque: <?= htmlspecialchars($configuracaoSistema['corDestaque']) ?>;
+            --tema-destaque-escura: <?= htmlspecialchars($configuracaoSistema['corDestaqueEscura']) ?>;
+            --tema-destaque-overlay: <?= htmlspecialchars($configuracaoSistema['corDestaqueOverlay']) ?>;
+            --tema-destaque-escura-overlay: <?= htmlspecialchars($configuracaoSistema['corDestaqueEscuraOverlay']) ?>;
+            --tema-texto-menu: <?= htmlspecialchars($configuracaoSistema['corTextoMenu']) ?>;
+            --marca-icone: url("<?= htmlspecialchars($configuracaoSistema['iconeMarca']) ?>");
+        }
+    </style>
 
 </head>
 
-<body>
+<body class="marca-<?= htmlspecialchars($configuracaoSistema['identidade']) ?>">
 
     <header class="home-header">
 
         <div class="home-logo">
-            <a href="https://netcom.tv.br">
+            <a href="?c=home">
                 <img
-                    src="public/img/logo.png"
-                    alt="Netcom">
+                    src="<?= htmlspecialchars($configuracaoSistema['logoMarca']) ?>"
+                    alt="<?= htmlspecialchars($configuracaoSistema['nomeMarca']) ?>">
             </a>
         </div>
 
@@ -51,12 +72,12 @@
     <section class="home-hero">
 
         <h1>
-            Banco de Talentos Netcom
+            Banco de Talentos <?= htmlspecialchars($configuracaoSistema['nomeMarca']) ?>
         </h1>
 
         <p>
 
-            Faça parte da equipe que conecta pessoas através da tecnologia.
+            Faça parte da equipe <?= htmlspecialchars($configuracaoSistema['nomeMarca']) ?> e conecte pessoas através da tecnologia.
 
         </p>
 
@@ -256,7 +277,6 @@
                     class="btn-curriculo"
                     id='btnCurriculoLivre2'>
 
-                    <i class="fa-solid fa-file-arrow-up"></i>
                     Deixe seu Currículo
 
                 </button>
@@ -459,6 +479,24 @@
                         placeholder="Seu nome completo"
                         required
                         pattern="^[A-Za-zÀ-ÿ\s]{5,100}$">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="linkedin">
+                        LinkedIn
+                    </label>
+
+                    <input
+                        type="url"
+                        name="linkedin"
+                        id="linkedin"
+                        maxlength="255"
+                        autocomplete="url"
+                        placeholder="https://www.linkedin.com/in/seu-perfil"
+                        pattern="https://([A-Za-z0-9\-]+\.)*linkedin\.com/in/[A-Za-z0-9._%~\-]+/?"
+                        title="Informe um link de perfil do LinkedIn usando HTTPS.">
 
                 </div>
 
@@ -796,7 +834,8 @@
                     <br>
                     <div
                         class="cf-turnstile"
-                        data-sitekey="0x4AAAAAADp1NonOnccCYXZy">
+                        data-sitekey="<?= htmlspecialchars(Turnstile::siteKey()) ?>"
+                        data-action="candidatura">
                     </div>
                     <br>
 
@@ -1721,6 +1760,9 @@
                 "input[name='email']"
             ).value =
             candidato.email ?? "";
+
+        document.getElementById("linkedin").value =
+            candidato.linkedin ?? "";
 
         document.getElementById("escolaridade").value =
             candidato.escolaridade ?? "";

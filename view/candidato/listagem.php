@@ -3,6 +3,7 @@
     <h1>Candidatos</h1>
 
     <a href="?c=candidato&m=add" class="btn">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
         Novo Candidato
     </a>
 
@@ -14,7 +15,7 @@
 
         <i class="fa-solid fa-magnifying-glass"></i>
 
-        <form method="GET" id="formFiltros" class="form-busca">
+        <form method="GET" id="formFiltros" class="form-busca painel-filtros painel-filtros-candidatos">
 
             <input
                 type="hidden"
@@ -25,7 +26,7 @@
                 type="text"
                 name="busca"
                 placeholder="Nome, Telefone ou Email"
-                value="<?= $_GET['busca'] ?? '' ?>">
+                value="<?= htmlspecialchars($_GET['busca'] ?? '') ?>">
 
             <select name="status_candidato">
 
@@ -33,9 +34,14 @@
                     Todos os Status
                 </option>
 
-                <option value="Em Analise"
-                    <?= ($_GET['status_candidato'] ?? '') == 'Em Analise' ? 'selected' : '' ?>>
-                    Em Análise
+                <option value="Aguardando Entrevista"
+                    <?= ($_GET['status_candidato'] ?? '') == 'Aguardando Entrevista' ? 'selected' : '' ?>>
+                    Aguardando Entrevista
+                </option>
+
+                <option value="Entrevista Agendada"
+                    <?= ($_GET['status_candidato'] ?? '') == 'Entrevista Agendada' ? 'selected' : '' ?>>
+                    Entrevista Agendada
                 </option>
 
                 <option value="Aprovado"
@@ -46,6 +52,26 @@
                 <option value="Reprovado"
                     <?= ($_GET['status_candidato'] ?? '') == 'Reprovado' ? 'selected' : '' ?>>
                     Reprovado
+                </option>
+
+                <option value="Recusado"
+                    <?= ($_GET['status_candidato'] ?? '') == 'Recusado' ? 'selected' : '' ?>>
+                    Recusado
+                </option>
+
+                <option value="Entrevistado"
+                    <?= ($_GET['status_candidato'] ?? '') == 'Entrevistado' ? 'selected' : '' ?>>
+                    Entrevistado
+                </option>
+
+                <option value="Vaga Preenchida por Contratação"
+                    <?= ($_GET['status_candidato'] ?? '') == 'Vaga Preenchida por Contratação' ? 'selected' : '' ?>>
+                    Vaga Preenchida por Contratação
+                </option>
+
+                <option value="Vaga Fechada"
+                    <?= ($_GET['status_candidato'] ?? '') == 'Vaga Fechada' ? 'selected' : '' ?>>
+                    Vaga Fechada
                 </option>
 
             </select>
@@ -146,6 +172,8 @@
 
             </select>
 
+            <div class="linha-secundaria-filtros">
+
             <div class="grupo-filtro">
 
                 <label for="data_inicial">
@@ -159,6 +187,10 @@
                     value="<?= htmlspecialchars($filtros['data_inicial'] ?? '') ?>">
 
             </div>
+
+            <div class="intervalo-seta" aria-hidden="true">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
 
             <div class="grupo-filtro">
 
@@ -180,7 +212,7 @@
                     type="button"
                     class="btn-filtro"
                     onclick="abrirModalCategorias()">
-
+                    <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
                     Categorias
 
                 </button>
@@ -189,7 +221,7 @@
                     type="button"
                     class="btn-filtro"
                     onclick="abrirModalHabilidades()">
-
+                    <i class="fa-solid fa-star" aria-hidden="true"></i>
                     Habilidades
 
                 </button>
@@ -252,8 +284,11 @@
             <button
                 type="submit"
                 class="btn">
-                Buscar
+                <i class="fa-solid fa-filter" aria-hidden="true"></i>
+                Filtrar
             </button>
+
+            </div>
 
         </form>
 
@@ -418,27 +453,39 @@
                     <?php
 
                     $status =
-                        $candidato['status_candidato'];
+                        $candidato['status_exibicao']
+                        ?? $candidato['status_candidato'];
 
                     ?>
 
-                    <span class="status-candidato
+                    <?php
+                    $classeStatus = strtolower(
+                        str_replace(' ', '-', $status)
+                    );
+                    ?>
 
-<?=
-            strtolower(
-                str_replace(
-                    ' ',
-                    '-',
-                    $status
-                )
-            )
-?>
-
-">
-
-                        <?= $status ?>
-
-                    </span>
+                    <?php if (
+                        in_array(
+                            $status,
+                            ['Recusado', 'Entrevistado', 'Aprovado', 'Contratado'],
+                            true
+                        )
+                        && !empty($candidato['id_candidatura_status'])
+                    ): ?>
+                        <button
+                            type="button"
+                            class="status-candidato <?= $classeStatus ?> badge-detalhes-interativo"
+                            data-detalhes-id="<?= (int)$candidato['id_candidatura_status'] ?>"
+                            data-resultado="<?= htmlspecialchars($status) ?>"
+                            title="Ver detalhes da entrevista">
+                            <?= htmlspecialchars($status) ?>
+                            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                        </button>
+                    <?php else: ?>
+                        <span class="status-candidato <?= $classeStatus ?>">
+                            <?= htmlspecialchars($status) ?>
+                        </span>
+                    <?php endif; ?>
 
                 </td>
 
@@ -534,6 +581,8 @@
                                 Visualizar
                             </a>
 
+
+<?php if (podeExcluir()): ?>
                             <a
                                 href="?c=candidato&m=excluir&id=<?= $candidato['idCandidato'] ?>"
                                 class="btn-action btn-excluir"
@@ -541,6 +590,7 @@
                                 <i class="fa-solid fa-trash"></i>
                                 Excluir
                             </a>
+<?php endif; ?>
                         </div>
                     </div>
 
@@ -820,3 +870,5 @@
     }
 </script>
 <script src="public/js/pesquisa.js"></script>
+<?php include "view/candidatura/modal_recusa.php"; ?>
+<script src="public/js/recusa-modal.js?v=<?= filemtime('public/js/recusa-modal.js') ?>"></script>

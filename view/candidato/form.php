@@ -4,6 +4,7 @@ $id = $candidato['idCandidato'] ?? '';
 $nome = $candidato['nome'] ?? '';
 $telefone = $candidato['telefone'] ?? '';
 $email = $candidato['email'] ?? '';
+$linkedin = $candidato['linkedin'] ?? '';
 $escolaridade = $candidato['escolaridade'] ?? '';
 $estadoCivil = $candidato['estado_civil'] ?? '';
 $fumante = $candidato['fumante'] ?? 0;
@@ -13,14 +14,17 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
 
 ?>
 
-<h1>
-
-    <?= empty($id)
-        ? 'Novo Candidato'
-        : 'Editar Candidato'
-    ?>
-
-</h1>
+<div class="topo">
+    <div>
+        <span class="pagina-eyebrow">Gestão de candidatos</span>
+        <h1>
+            <?= empty($id)
+                ? 'Novo Candidato'
+                : 'Editar Candidato'
+            ?>
+        </h1>
+    </div>
+</div>
 
 <form
     action="?c=candidato&m=salvar"
@@ -31,55 +35,82 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
         name="idCandidato"
         value="<?= $id ?>">
 
-    <div class="form-grid">
+    <section class="form-section">
+        <div class="form-section-header">
+            <i class="fa-solid fa-address-card" aria-hidden="true"></i>
+            <h2>Dados pessoais</h2>
+        </div>
+
+    <div class="form-grid form-grid-3">
 
         <div class="form-group">
 
-            <label>Nome</label>
+            <label for="nomeCandidato">Nome</label>
 
             <input
                 type="text"
+                id="nomeCandidato"
                 name="nome"
-                value="<?= $nome ?>"
+                value="<?= htmlspecialchars($nome) ?>"
                 required>
 
         </div>
 
         <div class="form-group">
 
-            <label>Telefone</label>
+            <label for="telefone">Telefone</label>
 
             <input
                 id="telefone"
                 type="text"
                 name="telefone"
-                value="<?= $telefone ?>"
+                value="<?= htmlspecialchars($telefone) ?>"
                 required>
 
         </div>
 
-        <div class="form-group checkbox">
+        <div class="form-group checkbox checkbox-campo">
 
             <input
                 type="checkbox"
                 name="whatsapp"
                 <?= $whatsapp ? 'checked' : '' ?>>
 
-            <label>É WhatsApp</label>
+            <label>Este número possui WhatsApp</label>
 
         </div>
     </div>
 
-    <div class="form-group">
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="emailCandidato">E-mail</label>
+            <input
+                id="emailCandidato"
+                type="email"
+                name="email"
+                autocomplete="email"
+                value="<?= htmlspecialchars($email) ?>">
+        </div>
 
-        <label>Email</label>
+        <div class="form-group">
+            <label for="linkedinCandidato">LinkedIn</label>
+            <div class="input-com-icone">
+                <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
+                <input
+                    id="linkedinCandidato"
+                    type="url"
+                    name="linkedin"
+                    maxlength="255"
+                    autocomplete="url"
+                    placeholder="https://www.linkedin.com/in/seu-perfil"
+                    pattern="https://([A-Za-z0-9\-]+\.)*linkedin\.com/in/[A-Za-z0-9._%~\-]+/?"
+                    title="Informe um link de perfil do LinkedIn usando HTTPS."
+                    value="<?= htmlspecialchars($linkedin) ?>">
+            </div>
+        </div>
+    </div>
 
-        <input
-            type="email"
-            name="email"
-            value="<?= $email ?>">
-
-        <div class="form-grid">
+        <div class="form-grid form-grid-4">
 
             <div class="form-group">
 
@@ -143,7 +174,7 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
 
             </div>
 
-            <div class="form-group checkbox">
+            <div class="form-group checkbox checkbox-campo">
 
                 <input
                     type="checkbox"
@@ -151,7 +182,7 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
                     value="1"
                     <?= $fumante ? 'checked' : '' ?>>
 
-                <label>Fumante</label>
+                <label>Candidato fumante</label>
 
             </div>
 
@@ -191,13 +222,13 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
 
         </div>
 
-        <div class="form-group">
-            <br>
-            <label>
+        <div class="form-group campo-span-2">
+            <label for="curriculoCandidato">
                 Currículo
             </label>
 
             <input
+                id="curriculoCandidato"
                 type="file"
                 name="curriculo"
                 accept="
@@ -254,7 +285,13 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
 
 
 
-    </div>
+    </section>
+
+    <section class="form-section">
+        <div class="form-section-header">
+            <i class="fa-solid fa-file-lines" aria-hidden="true"></i>
+            <h2>Informações complementares</h2>
+        </div>
 
     <div class="form-group">
 
@@ -262,9 +299,17 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
 
         <textarea
             name="observacoes"
-            rows="5"><?= $observacoes ?></textarea>
+            rows="5"><?= htmlspecialchars($observacoes) ?></textarea>
 
-        <h2>Habilidades</h2>
+    </div>
+
+    </section>
+
+    <section class="form-section">
+        <div class="form-section-header">
+            <i class="fa-solid fa-star" aria-hidden="true"></i>
+            <h2>Habilidades</h2>
+        </div>
 
         <div class="habilidades-container">
 
@@ -313,19 +358,6 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
 
             </div>
 
-            <div
-                class="form-group"
-                id="grupoDescricao"
-                style="display:none;">
-
-                <label>Descrição da Habilidade</label>
-
-                <input
-                    type="text"
-                    id="descricaoPersonalizada">
-
-            </div>
-
             <div class="form-group">
 
                 <div class="nivel-header">
@@ -351,6 +383,7 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
                 type="button"
                 class="btn"
                 onclick="adicionarHabilidade()">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
                 Adicionar Habilidade
             </button>
 
@@ -364,13 +397,17 @@ $whatsapp = $candidato['whatsapp'] ?? 0;
 
         <div id="inputsOcultos"></div>
 
+    </section>
+
+    <div class="form-actions">
+        <a class="btn-secundario" href="?c=candidato">
+            Cancelar
+        </a>
+        <button class="btn">
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+            Salvar candidato
+        </button>
     </div>
-
-    <button class="btn">
-
-        Salvar
-
-    </button>
 
     <div id="teste"></div>
 

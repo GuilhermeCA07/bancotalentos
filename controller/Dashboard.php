@@ -15,10 +15,17 @@ class Dashboard
 
     public function index()
     {
+        $periodoMeses = (int)($_GET['periodo'] ?? 6);
+
+        if (!in_array($periodoMeses, [3, 6, 12, 24], true)) {
+            $periodoMeses = 6;
+        }
+
+        $rotuloPeriodo = 'Últimos ' . $periodoMeses . ' meses';
 
         $proximasEntrevistas =
             $this->model
-            ->proximasEntrevistas();
+            ->proximasEntrevistas(8);
 
         $totalCandidatos =
             $this->model
@@ -38,11 +45,31 @@ class Dashboard
 
         $resumoCandidaturas =
             $this->model
-            ->resumoCandidaturas();
+            ->resumoCandidaturas($periodoMeses);
 
         $totalEntrevistas =
             $this->model
             ->totalEntrevistas();
+
+        $indicadores =
+            $this->model
+            ->indicadoresComplementares();
+
+        $alertas =
+            $this->model
+            ->alertasOperacionais();
+
+        $evolucaoMensal =
+            $this->model
+            ->evolucaoMensal($periodoMeses);
+
+        $candidaturasPorVaga =
+            $this->model
+            ->candidaturasPorVaga(6, $periodoMeses);
+
+        $funilRecrutamento =
+            $this->model
+            ->funilRecrutamento($periodoMeses);
 
         include "view/template/cabecalho.php";
         include "view/template/menu.php";

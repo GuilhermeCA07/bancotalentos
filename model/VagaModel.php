@@ -1,19 +1,19 @@
 <?php
-require_once "config/Conexao.php";
+
+require_once 'config/Conexao.php';
 
 class VagaModel
 {
     private $conexao;
 
-    function __construct()
+    public function __construct()
     {
-        $this->conexao =
-            Conexao::getConnection();
+        $this->conexao = Conexao::getConnection();
     }
 
-    function inserir(
+    public function inserir(
         $titulo,
-        $departamento,
+        $departamentoId,
         $quantidade,
         $cidade,
         $modalidade,
@@ -26,35 +26,21 @@ class VagaModel
         $status,
         $cnh
     ) {
-
-        $sql = "INSERT INTO vagas
-        (
-            titulo,
-            departamento,
-            cnh_obrigatoria,
-            quantidade_vagas,
-            cidade,
-            modalidade,
-            escala,
-            tipo_contratacao,
-            salario,
-            descricao,
-            requisitos,
-            observacoes,
-            status
-        )
-        VALUES
-        (
-            ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        )";
-
-        $comando =
-            $this->conexao->prepare($sql);
-
+        $sql = '
+            INSERT INTO vagas
+            (
+                titulo, departamento_id, cnh_obrigatoria,
+                quantidade_vagas, cidade, modalidade, escala,
+                tipo_contratacao, salario, descricao, requisitos,
+                observacoes, status
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ';
+        $comando = $this->conexao->prepare($sql);
         $comando->bind_param(
-            "ssiissssdssss",
+            'siiissssdssss',
             $titulo,
-            $departamento,
+            $departamentoId,
             $cnh,
             $quantidade,
             $cidade,
@@ -71,10 +57,10 @@ class VagaModel
         return $comando->execute();
     }
 
-    function atualizar(
+    public function atualizar(
         $id,
         $titulo,
-        $departamento,
+        $departamentoId,
         $quantidade,
         $cidade,
         $modalidade,
@@ -87,31 +73,19 @@ class VagaModel
         $status,
         $cnh
     ) {
-
-        $sql = "UPDATE vagas
-        SET
-            titulo = ?,
-            departamento = ?,
-            cnh_obrigatoria = ?,
-            quantidade_vagas = ?,
-            cidade = ?,
-            escala = ?,
-            modalidade = ?,
-            tipo_contratacao = ?,
-            salario = ?,
-            descricao = ?,
-            requisitos = ?,
-            observacoes = ?,
-            status = ?
-        WHERE idVaga = ?";
-
-        $comando =
-            $this->conexao->prepare($sql);
-
+        $sql = '
+            UPDATE vagas
+            SET titulo = ?, departamento_id = ?, cnh_obrigatoria = ?,
+                quantidade_vagas = ?, cidade = ?, escala = ?,
+                modalidade = ?, tipo_contratacao = ?, salario = ?,
+                descricao = ?, requisitos = ?, observacoes = ?, status = ?
+            WHERE idVaga = ?
+        ';
+        $comando = $this->conexao->prepare($sql);
         $comando->bind_param(
-            "ssiissssdssssi",
+            'siiissssdssssi',
             $titulo,
-            $departamento,
+            $departamentoId,
             $cnh,
             $quantidade,
             $cidade,
@@ -129,439 +103,169 @@ class VagaModel
         return $comando->execute();
     }
 
-    function buscarTodos(
-        $filtros = [],
-        $limite = null,
-        $offset = null
-    ) {
-        $sql = "
-        SELECT *
-        FROM vagas
-        WHERE 1 = 1
-    ";
-
-        $tipos = "";
-        $valores = [];
-
-        if (!empty($filtros['busca'])) {
-
-            $sql .= "
-        AND (
-            titulo LIKE ?
-            OR departamento LIKE ?
-            OR status LIKE ?
-            OR cidade LIKE ?
-            OR modalidade LIKE ?
-            OR tipo_contratacao LIKE ?
-            OR escala LIKE ?
-            OR descricao LIKE ?
-        )
-    ";
-
-            $busca = "%" . $filtros['busca'] . "%";
-
-            $tipos .= "ssssssss";
-
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-        }
-
-
-
-        if (
-            !empty($filtros['departamento'])
-        ) {
-
-            $sql .= "
-            AND departamento = ?
-        ";
-
-            $tipos .= "s";
-
-            $valores[] =
-                $filtros['departamento'];
-        }
-
-        if (
-            !empty($filtros['status'])
-        ) {
-
-            $sql .= "
-            AND status = ?
-        ";
-
-            $tipos .= "s";
-
-            $valores[] =
-                $filtros['status'];
-        }
-
-        if (!empty($filtros['modalidade'])) {
-
-            $sql .= "
-        AND modalidade = ?
-    ";
-
-            $tipos .= "s";
-
-            $valores[] =
-                $filtros['modalidade'];
-        }
-
-        if (!empty($filtros['escala'])) {
-
-            $sql .= "
-        AND escala = ?
-    ";
-
-            $tipos .= "s";
-
-            $valores[] =
-                $filtros['escala'];
-        }
-
-        if (!empty($filtros['cidade'])) {
-
-            $sql .= "
-        AND cidade LIKE ?
-    ";
-
-            $tipos .= "s";
-
-            $valores[] =
-                "%" .
-                $filtros['cidade'] .
-                "%";
-        }
-
-        $sql .= "
-    ORDER BY data_criacao DESC
-";
-
-        if (
-            $limite !== null
-            &&
-            $offset !== null
-        ) {
-
-            $sql .= "
-        LIMIT ?
-        OFFSET ?
-    ";
-
-            $tipos .= "ii";
-
-            $valores[] = $limite;
-            $valores[] = $offset;
-        }
-
-        $comando =
-            $this->conexao->prepare(
-                $sql
-            );
-
-        if (
-            !empty($valores)
-        ) {
-
-            $comando->bind_param(
-                $tipos,
-                ...$valores
-            );
-        }
-
-        if (
-            $comando->execute()
-        ) {
-
-            return $comando
-                ->get_result()
-                ->fetch_all(
-                    MYSQLI_ASSOC
-                );
-        }
-
-        return [];
-    }
-
-    function buscarPorStatus($status)
+    public function buscarTodos($filtros = [], $limite = null, $offset = null)
     {
-        $sql = "SELECT *
-                FROM vagas
-                WHERE status = ?
-                ORDER BY titulo";
+        $sql = $this->selectComDepartamento() . ' WHERE 1 = 1';
+        [$condicoes, $tipos, $valores] = $this->montarFiltros($filtros);
+        $sql .= $condicoes . ' ORDER BY v.data_criacao DESC';
 
-        $comando =
-            $this->conexao->prepare($sql);
-
-        $comando->bind_param(
-            "s",
-            $status
-        );
-
-        if ($comando->execute()) {
-
-            return $comando
-                ->get_result()
-                ->fetch_all(MYSQLI_ASSOC);
+        if ($limite !== null && $offset !== null) {
+            $sql .= ' LIMIT ? OFFSET ?';
+            $tipos .= 'ii';
+            $valores[] = (int)$limite;
+            $valores[] = (int)$offset;
         }
-
-        return [];
-    }
-
-    function buscarPorId($id)
-    {
-        $sql = "SELECT *
-                FROM vagas
-                WHERE idVaga = ?";
-
-        $comando =
-            $this->conexao->prepare($sql);
-
-        $comando->bind_param(
-            "i",
-            $id
-        );
-
-        if ($comando->execute()) {
-
-            return $comando
-                ->get_result()
-                ->fetch_assoc();
-        }
-
-        return null;
-    }
-
-    function alterarStatus(
-        $id,
-        $status
-    ) {
-
-        $sql = "UPDATE vagas
-                SET status = ?
-                WHERE idVaga = ?";
-
-        $comando =
-            $this->conexao->prepare($sql);
-
-        $comando->bind_param(
-            "si",
-            $status,
-            $id
-        );
-
-        return $comando->execute();
-    }
-
-    function excluir($id)
-    {
-        $sql = "DELETE
-                FROM vagas
-                WHERE idVaga = ?";
-
-        $comando =
-            $this->conexao->prepare($sql);
-
-        $comando->bind_param(
-            "i",
-            $id
-        );
-
-        return $comando->execute();
-    }
-
-    function buscarAbertas()
-    {
-        $sql = "
-        SELECT *
-        FROM vagas
-        WHERE status = 'Aberta'
-        ORDER BY titulo
-    ";
 
         $comando = $this->conexao->prepare($sql);
-
-        if ($comando->execute()) {
-            return $comando
-                ->get_result()
-                ->fetch_all(MYSQLI_ASSOC);
+        if ($valores) {
+            $comando->bind_param($tipos, ...$valores);
         }
-
-        return [];
-    }
-
-    function contarRegistros($filtros = [])
-    {
-        $sql = "
-        SELECT COUNT(*) AS total
-        FROM vagas
-        WHERE 1 = 1
-    ";
-
-        $tipos = "";
-        $valores = [];
-
-
-        if (!empty($filtros['busca'])) {
-
-            $sql .= "
-        AND (
-            titulo LIKE ?
-            OR departamento LIKE ?
-            OR status LIKE ?
-            OR cidade LIKE ?
-            OR modalidade LIKE ?
-            OR tipo_contratacao LIKE ?
-            OR escala LIKE ?
-            OR descricao LIKE ?
-        )
-    ";
-
-            $busca = "%" . $filtros['busca'] . "%";
-
-            $tipos .= "ssssssss";
-
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-            $valores[] = $busca;
-        }
-
-
-        if (!empty($filtros['departamento'])) {
-
-            $sql .= "
-            AND departamento = ?
-        ";
-
-            $tipos .= "s";
-
-            $valores[] =
-                $filtros['departamento'];
-        }
-
-        if (!empty($filtros['status'])) {
-
-            $sql .= "
-            AND status = ?
-        ";
-
-            $tipos .= "s";
-
-            $valores[] =
-                $filtros['status'];
-        }
-
-        if (!empty($filtros['modalidade'])) {
-
-            $sql .= "
-        AND modalidade = ?
-    ";
-
-            $tipos .= "s";
-
-            $valores[] =
-                $filtros['modalidade'];
-        }
-
-        if (!empty($filtros['escala'])) {
-
-            $sql .= "
-        AND escala = ?
-    ";
-
-            $tipos .= "s";
-
-            $valores[] =
-                $filtros['escala'];
-        }
-
-        if (!empty($filtros['cidade'])) {
-
-            $sql .= "
-        AND cidade LIKE ?
-    ";
-
-            $tipos .= "s";
-
-            $valores[] =
-                "%" .
-                $filtros['cidade'] .
-                "%";
-        }
-
-        $comando =
-            $this->conexao->prepare($sql);
-
-
-        if (!empty($valores)) {
-
-            $comando->bind_param(
-                $tipos,
-                ...$valores
-            );
-        }
-
         $comando->execute();
 
-        return $comando
-            ->get_result()
-            ->fetch_assoc()['total'];
+        return $comando->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function buscarPorStatus($status)
+    {
+        $sql = $this->selectComDepartamento()
+            . ' WHERE v.status = ? ORDER BY v.titulo';
+        $comando = $this->conexao->prepare($sql);
+        $comando->bind_param('s', $status);
+        $comando->execute();
+
+        return $comando->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function buscarPorId($id)
+    {
+        $sql = $this->selectComDepartamento() . ' WHERE v.idVaga = ?';
+        $comando = $this->conexao->prepare($sql);
+        $comando->bind_param('i', $id);
+        $comando->execute();
+
+        return $comando->get_result()->fetch_assoc();
+    }
+
+    public function alterarStatus($id, $status)
+    {
+        $comando = $this->conexao->prepare(
+            'UPDATE vagas SET status = ? WHERE idVaga = ?'
+        );
+        $comando->bind_param('si', $status, $id);
+
+        return $comando->execute();
+    }
+
+    public function excluir($id)
+    {
+        $comando = $this->conexao->prepare(
+            'DELETE FROM vagas WHERE idVaga = ?'
+        );
+        $comando->bind_param('i', $id);
+
+        return $comando->execute();
+    }
+
+    public function buscarAbertas()
+    {
+        $sql = $this->selectComDepartamento()
+            . " WHERE v.status = 'Aberta' ORDER BY v.titulo";
+
+        return $this->conexao
+            ->query($sql)
+            ->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public function contarRegistros($filtros = [])
+    {
+        $sql = '
+            SELECT COUNT(*) total
+            FROM vagas v
+            INNER JOIN departamentos d
+                ON d.idDepartamento = v.departamento_id
+            WHERE 1 = 1
+        ';
+        [$condicoes, $tipos, $valores] = $this->montarFiltros($filtros);
+        $comando = $this->conexao->prepare($sql . $condicoes);
+
+        if ($valores) {
+            $comando->bind_param($tipos, ...$valores);
+        }
+        $comando->execute();
+
+        return (int)$comando->get_result()->fetch_assoc()['total'];
     }
 
     public function buscarVagasAtivas()
     {
-        $sql = "
-
-        SELECT *
-
-        FROM vagas
-
-        WHERE status = 'Aberta'
-
-        ORDER BY titulo
-    ";
-
-        $comando =
-            $this->conexao
-            ->prepare($sql);
-
-        $comando->execute();
-
-        return $comando
-            ->get_result()
-            ->fetch_all(
-                MYSQLI_ASSOC
-            );
+        return $this->buscarPorStatus('Aberta');
     }
 
     public function fecharVaga($idVaga)
     {
-        $sql = "
-        UPDATE vagas
-        SET status = 'Fechada'
-        WHERE idVaga = ?
-    ";
-
-        $comando =
-            $this->conexao->prepare($sql);
-
-        $comando->bind_param(
-            "i",
-            $idVaga
+        $comando = $this->conexao->prepare(
+            "UPDATE vagas SET status = 'Fechada' WHERE idVaga = ?"
         );
+        $comando->bind_param('i', $idVaga);
 
         return $comando->execute();
+    }
+
+    private function selectComDepartamento()
+    {
+        return '
+            SELECT
+                v.*,
+                d.nome AS departamento,
+                d.cor AS departamento_cor
+            FROM vagas v
+            INNER JOIN departamentos d
+                ON d.idDepartamento = v.departamento_id
+        ';
+    }
+
+    private function montarFiltros($filtros)
+    {
+        $sql = '';
+        $tipos = '';
+        $valores = [];
+
+        if (!empty($filtros['busca'])) {
+            $sql .= '
+                AND (
+                    v.titulo LIKE ? OR d.nome LIKE ? OR v.status LIKE ?
+                    OR v.cidade LIKE ? OR v.modalidade LIKE ?
+                    OR v.tipo_contratacao LIKE ? OR v.escala LIKE ?
+                    OR v.descricao LIKE ?
+                )
+            ';
+            $busca = '%' . $filtros['busca'] . '%';
+            $tipos .= 'ssssssss';
+            for ($i = 0; $i < 8; $i++) {
+                $valores[] = $busca;
+            }
+        }
+
+        if (!empty($filtros['departamento_id'])) {
+            $sql .= ' AND d.idDepartamento = ?';
+            $tipos .= 'i';
+            $valores[] = (int)$filtros['departamento_id'];
+        }
+
+        foreach (['status', 'modalidade', 'escala'] as $campo) {
+            if (!empty($filtros[$campo])) {
+                $sql .= " AND v.$campo = ?";
+                $tipos .= 's';
+                $valores[] = $filtros[$campo];
+            }
+        }
+
+        if (!empty($filtros['cidade'])) {
+            $sql .= ' AND v.cidade LIKE ?';
+            $tipos .= 's';
+            $valores[] = '%' . $filtros['cidade'] . '%';
+        }
+
+        return [$sql, $tipos, $valores];
     }
 }

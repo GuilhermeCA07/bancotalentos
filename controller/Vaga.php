@@ -1,6 +1,7 @@
 <?php
 require "model/VagaModel.php";
 require_once "model/CandidaturaModel.php";
+require_once "model/DepartamentoModel.php";
 require_once "helper/Autorizacao.php";
 require_once "helper/Retorno.php";
 
@@ -8,6 +9,7 @@ class Vaga
 {
     private $model;
     private $candidaturaModel;
+    private $departamentoModel;
 
     function __construct()
     {
@@ -19,46 +21,21 @@ class Vaga
 
         $this->candidaturaModel =
             new CandidaturaModel();
+
+        $this->departamentoModel =
+            new DepartamentoModel();
     }
 
     function index()
     {
-
-        function corDepartamento($departamento)
-        {
-            switch ($departamento) {
-                case 'NOC':
-                    return '#0F4DB0';
-
-                case 'Financeiro':
-                    return '#16A34A';
-
-                case 'Comercial/Atendimento':
-                    return '#FF6B00';
-
-                case 'Suporte Técnico':
-                    return '#7C3AED';
-
-                case 'Infra':
-                    return '#DC2626';
-
-                case 'Técnico de Rua':
-                    return '#0891B2';
-
-                default:
-                    return '#6B7280';
-            }
-        }
-
-
 
         $filtros = [
 
             'busca' =>
             trim($_GET['busca'] ?? ''),
 
-            'departamento' =>
-            $_GET['departamento'] ?? '',
+            'departamento_id' =>
+            (int)($_GET['departamento_id'] ?? 0),
 
             'modalidade' =>
             $_GET['modalidade'] ?? '',
@@ -109,6 +86,10 @@ class Vaga
                 $offset
             );
 
+        $departamentos =
+            $this->departamentoModel
+            ->buscarAtivos();
+
         salvarRetorno();
 
         include "view/template/cabecalho.php";
@@ -120,6 +101,10 @@ class Vaga
 
     function add()
     {
+        $departamentos =
+            $this->departamentoModel
+            ->buscarAtivos();
+
         include "view/template/cabecalho.php";
         include "view/template/menu.php";
         include "view/vaga/form.php";
@@ -131,6 +116,15 @@ class Vaga
         $vaga =
             $this->model
             ->buscarPorId($id);
+
+        if (!$vaga) {
+            $_SESSION['erro'] = 'Vaga não encontrada.';
+            voltarParaRetorno('Location:?c=vaga');
+        }
+
+        $departamentos =
+            $this->departamentoModel
+            ->buscarAtivos($vaga['departamento_id'] ?? null);
 
         if (
             $vaga['status']
@@ -148,6 +142,16 @@ class Vaga
 
     function salvar()
     {
+
+        $departamentoId = (int)($_POST['departamento_id'] ?? 0);
+        $departamento =
+            $this->departamentoModel
+            ->buscarPorId($departamentoId);
+
+        if (!$departamento || !$departamento['ativo']) {
+            $_SESSION['erro'] = 'Selecione um departamento ativo.';
+            voltarParaRetorno('Location:?c=vaga');
+        }
 
 
         if (empty($_POST['idVaga'])) {
@@ -170,7 +174,7 @@ class Vaga
 
             $this->model->inserir(
                 $_POST['titulo'],
-                $_POST['departamento'],
+                $departamentoId,
                 $_POST['quantidade_vagas'],
                 $_POST['cidade'],
                 $_POST['modalidade'],
@@ -202,7 +206,7 @@ class Vaga
             $this->model->atualizar(
                 $_POST['idVaga'],
                 $_POST['titulo'],
-                $_POST['departamento'],
+                $departamentoId,
                 $_POST['quantidade_vagas'],
                 $_POST['cidade'],
                 $_POST['modalidade'],
@@ -279,7 +283,8 @@ class Vaga
 
             $this->candidaturaModel
                 ->encerrarPorFechamentoVaga(
-                    $id
+                    $id,
+                    'Vaga Fechada'
                 );
         }
 
@@ -287,7 +292,8 @@ class Vaga
     }
 
     function excluir($id)
-    {
+    {
+        validarPermissaoExclusao();
         $this->model
             ->excluir($id);
 

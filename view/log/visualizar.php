@@ -65,7 +65,7 @@
             <div class="log-info-item">
                 <span class="label">Acao</span>
                 <span>
-                    <?= htmlspecialchars($log['acao']) ?>
+                    <?= htmlspecialchars(rotuloAcaoLog($log['acao'])) ?>
                 </span>
             </div>
 

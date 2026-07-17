@@ -5,6 +5,7 @@ require "model/HabilidadeModel.php";
 require_once "helper/Autorizacao.php";
 require_once "helper/Retorno.php";
 require_once "model/CategoriaModel.php";
+require_once "helper/Linkedin.php";
 
 class Candidato
 {
@@ -158,6 +159,24 @@ class Candidato
 
         if (isset($_POST['nome']) && !empty($_POST['nome'])) {
 
+            try {
+                $linkedin = normalizarLinkedin(
+                    $_POST['linkedin'] ?? ''
+                );
+            } catch (InvalidArgumentException $erro) {
+                $_SESSION['erro'] = $erro->getMessage();
+
+                $idCandidato = (int)(
+                    $_POST['idCandidato'] ?? 0
+                );
+                $destino = $idCandidato > 0
+                    ? '?c=candidato&m=editar&id=' . $idCandidato
+                    : '?c=candidato&m=add';
+
+                header('Location: ' . $destino);
+                exit;
+            }
+
             $whatsapp = isset($_POST['whatsapp']) ? 1 : 0;
 
             $curriculo = $this->salvarCurriculo();
@@ -196,7 +215,8 @@ class Candidato
                     $escolaridade,
                     $estadoCivil,
                     $fumante,
-                    $cnh
+                    $cnh,
+                    $linkedin
                 );
 
                 $idCandidato = $this->model->buscarUltimoId();
@@ -226,7 +246,8 @@ class Candidato
                     $escolaridade,
                     $estadoCivil,
                     $fumante,
-                    $cnh
+                    $cnh,
+                    $linkedin
                 );
 
                 $idCandidato = $_POST['idCandidato'];
@@ -291,7 +312,8 @@ class Candidato
     }
 
     function excluir($id)
-    {
+    {
+        validarPermissaoExclusao();
         $this->model->excluir($id);
 
         voltarParaRetorno("?c=candidato");

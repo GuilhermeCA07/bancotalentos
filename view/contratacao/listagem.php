@@ -1,32 +1,32 @@
-<div class="page-header">
-
-    <h1>
-        Contratações
-    </h1>
-    <br>
+<div class="topo">
+    <div>
+        <span class="pagina-eyebrow">Admissões</span>
+        <h1>Contratações</h1>
+    </div>
 </div>
 
 
 <div class="toolbar">
-
-    <div class="busca-container">
-
-        <i class="fa-solid fa-magnifying-glass"></i>
-
-        <form method="GET" class="form-busca">
+        <form method="GET" class="form-busca painel-filtros">
 
             <input
                 type="hidden"
                 name="c"
                 value="contratacao">
 
-            <input
-                type="text"
-                name="busca"
-                value="<?= $_GET['busca'] ?? '' ?>"
-                placeholder="Nome ou vaga">
+            <div class="campo-filtro campo-filtro-busca">
+                <label for="buscaContratacao">Buscar</label>
+                <div class="entrada-com-icone">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input id="buscaContratacao" type="text" name="busca"
+                        value="<?= htmlspecialchars($_GET['busca'] ?? '') ?>"
+                        placeholder="Candidato ou vaga">
+                </div>
+            </div>
 
-            <select name="status">
+            <div class="campo-filtro campo-filtro-status">
+                <label for="statusContratacao">Situação</label>
+                <select id="statusContratacao" name="status">
 
                 <option value="">
                     Todos os Status
@@ -56,33 +56,32 @@
                     Auto-Dispensa
                 </option>
 
-            </select>
+                </select>
+            </div>
 
-            <input
-                type="date"
-                name="data_inicio"
-                value="<?= $_GET['data_inicio'] ?? '' ?>">
-
-            <span class="filtro-separador">
-                até
-            </span>
-
-            <input
-                type="date"
-                name="data_fim"
-                value="<?= $_GET['data_fim'] ?? '' ?>">
+            <div class="grupo-intervalo">
+                <div class="campo-filtro">
+                    <label for="dataInicioContratacao">Data inicial</label>
+                    <input id="dataInicioContratacao" type="date" name="data_inicio"
+                        value="<?= htmlspecialchars($_GET['data_inicio'] ?? '') ?>">
+                </div>
+                <div class="intervalo-seta" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="campo-filtro">
+                    <label for="dataFimContratacao">Data final</label>
+                    <input id="dataFimContratacao" type="date" name="data_fim"
+                        value="<?= htmlspecialchars($_GET['data_fim'] ?? '') ?>">
+                </div>
+            </div>
 
             <button
                 type="submit"
-                class="btn">
-
-                Buscar
+                class="btn btn-filtrar">
+                <i class="fa-solid fa-filter" aria-hidden="true"></i>
+                Filtrar
 
             </button>
 
         </form>
-
-    </div>
 
 </div>
 <table class="table">
@@ -128,17 +127,37 @@
 
                 <td>
 
-                    <span class="
-                    badge-status
-                    badge-<?= strtolower(
-                                str_replace(
-                                    ' ',
-                                    '-',
-                                    $item['status_exibicao'] ?? 'aguardando'
-                                )
-                            ) ?>">
-                        <?= $item['status_exibicao'] ?? 'Aguardando' ?>
-                    </span>
+                    <?php
+                    $statusExibicao = $item['status_exibicao'] ?? 'Aguardando';
+                    $classeStatus = strtolower(
+                        str_replace(' ', '-', $statusExibicao)
+                    );
+                    $possuiDetalhes = in_array(
+                        $statusExibicao,
+                        ['Aguardando', 'Contratado'],
+                        true
+                    );
+                    $resultadoDetalhes = $statusExibicao === 'Aguardando'
+                        ? 'Aprovado'
+                        : $statusExibicao;
+                    ?>
+
+                    <?php if ($possuiDetalhes): ?>
+                        <button
+                            type="button"
+                            class="badge-status badge-<?= htmlspecialchars($classeStatus) ?> badge-detalhes-interativo"
+                            data-detalhes-id="<?= (int)$item['idCandidatura'] ?>"
+                            data-detalhes-endpoint="?c=contratacao&amp;m=detalhesResultado"
+                            data-resultado="<?= htmlspecialchars($resultadoDetalhes) ?>"
+                            title="Ver detalhes da entrevista">
+                            <?= htmlspecialchars($statusExibicao) ?>
+                            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                        </button>
+                    <?php else: ?>
+                        <span class="badge-status badge-<?= htmlspecialchars($classeStatus) ?>">
+                            <?= htmlspecialchars($statusExibicao) ?>
+                        </span>
+                    <?php endif; ?>
 
                 </td>
 
@@ -441,3 +460,5 @@
         }
     );
 </script>
+<?php include "view/candidatura/modal_recusa.php"; ?>
+<script src="public/js/recusa-modal.js?v=<?= filemtime('public/js/recusa-modal.js') ?>"></script>

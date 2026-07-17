@@ -6,7 +6,7 @@ class Conexao
 
     public static function getConnection()
     {
-        $ip = "localhost";
+        $ip = "127.0.0.1";
         $port = "3306";
         $user = "root";
         $pass = "";
@@ -15,6 +15,7 @@ class Conexao
         if (!self::$con) {
             self::$con = new mysqli($ip, $user, $pass, $db, $port);
             self::$con->set_charset("utf8mb4");
+            self::$con->query("SET time_zone = '-03:00'");
 
             if (self::$con->connect_error) {
                 echo self::$con->connect_error;

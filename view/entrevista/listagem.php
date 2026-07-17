@@ -7,63 +7,78 @@
 </div>
 
 <div class="toolbar">
-
-    <div class="busca-container">
-
-        <i class="fa-solid fa-magnifying-glass"></i>
-
-        <form method="GET" class="form-busca">
+        <form method="GET" class="form-busca painel-filtros">
 
             <input
                 type="hidden"
                 name="c"
                 value="entrevista">
 
-            <input
-                type="text"
-                name="busca"
-                value="<?= $_GET['busca'] ?? '' ?>"
-                placeholder="Candidato, vaga ou responsável">
+            <div class="campo-filtro campo-filtro-busca">
+                <label for="buscaEntrevista">Buscar</label>
+                <div class="entrada-com-icone">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input
+                        id="buscaEntrevista"
+                        type="text"
+                        name="busca"
+                        value="<?= htmlspecialchars($_GET['busca'] ?? '') ?>"
+                        placeholder="Candidato, vaga ou responsável">
+                </div>
+            </div>
 
-            <input
-                type="date"
-                name="data_inicio"
-                value="<?= $_GET['data_inicio'] ?? '' ?>">
+            <div class="grupo-intervalo">
+                <div class="campo-filtro">
+                    <label for="dataInicioEntrevista">Data inicial</label>
+                    <input id="dataInicioEntrevista" type="date" name="data_inicio"
+                        value="<?= htmlspecialchars($_GET['data_inicio'] ?? '') ?>">
+                </div>
+                <div class="intervalo-seta" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="campo-filtro">
+                    <label for="dataFimEntrevista">Data final</label>
+                    <input id="dataFimEntrevista" type="date" name="data_fim"
+                        value="<?= htmlspecialchars($_GET['data_fim'] ?? '') ?>">
+                </div>
+            </div>
 
-            <span class="filtro-separador">
-                até
-            </span>
+            <div class="grupo-intervalo grupo-intervalo-hora">
+                <div class="campo-filtro">
+                    <label for="horaInicioEntrevista">Hora inicial</label>
+                    <input id="horaInicioEntrevista" type="time" name="hora_inicio"
+                        value="<?= htmlspecialchars($_GET['hora_inicio'] ?? '') ?>">
+                </div>
+                <div class="intervalo-seta" aria-hidden="true"><i class="fa-solid fa-arrow-right"></i></div>
+                <div class="campo-filtro">
+                    <label for="horaFimEntrevista">Hora final</label>
+                    <input id="horaFimEntrevista" type="time" name="hora_fim"
+                        value="<?= htmlspecialchars($_GET['hora_fim'] ?? '') ?>">
+                </div>
+            </div>
 
-            <input
-                type="date"
-                name="data_fim"
-                value="<?= $_GET['data_fim'] ?? '' ?>">
-
-            <input
-                type="time"
-                name="hora_inicio"
-                value="<?= $_GET['hora_inicio'] ?? '' ?>">
-
-            <span class="filtro-separador">
-                até
-            </span>
-
-            <input
-                type="time"
-                name="hora_fim"
-                value="<?= $_GET['hora_fim'] ?? '' ?>">
+            <?php if ($podeVisualizarFinalizadas): ?>
+                <div class="campo-filtro campo-filtro-checkbox">
+                    <span class="campo-filtro-label">Exibi&ccedil;&atilde;o</span>
+                    <label class="checkbox-filtro">
+                        <input
+                            type="checkbox"
+                            name="incluir_finalizadas"
+                            value="1"
+                            <?= !empty($filtros['incluir_finalizadas']) ? 'checked' : '' ?>>
+                        <span class="checkbox-indicador" aria-hidden="true"></span>
+                        <span>Incluir finalizadas</span>
+                    </label>
+                </div>
+            <?php endif; ?>
 
             <button
                 type="submit"
-                class="btn">
-
-                Buscar
+                class="btn btn-filtrar">
+                <i class="fa-solid fa-filter" aria-hidden="true"></i>
+                Filtrar
 
             </button>
 
         </form>
-
-    </div>
 
 </div>
 <div class="table-container">
@@ -78,6 +93,7 @@
                 <th>Vaga</th>
                 <th>Data</th>
                 <th>Hora</th>
+                <th>Status</th>
                 <th>Responsável</th>
                 <th>Reagedamento</th>
                 <th>Ações</th>
@@ -91,6 +107,17 @@
             <?php if (!empty($entrevistas)): ?>
 
                 <?php foreach ($entrevistas as $e): ?>
+
+                    <?php
+                    $entrevistaFinalizada = in_array(
+                        $e['status'],
+                        ['Aprovado', 'Recusado', 'Entrevistado', 'Contratado'],
+                        true
+                    );
+                    $classeStatus = strtolower(
+                        str_replace(' ', '-', $e['status'])
+                    );
+                    ?>
 
                     <tr>
 
@@ -125,6 +152,25 @@
                                 0,
                                 5
                             ) ?>
+                        </td>
+
+                        <td>
+                            <?php if ($entrevistaFinalizada): ?>
+                            <button
+                                type="button"
+                                class="badge-status <?= htmlspecialchars($classeStatus) ?> badge-detalhes-interativo"
+                                data-detalhes-id="<?= (int)$e['candidatura_id'] ?>"
+                                data-detalhes-endpoint="?c=entrevista&amp;m=detalhesResultado"
+                                data-resultado="<?= htmlspecialchars($e['status']) ?>"
+                                title="Ver detalhes da entrevista">
+                                <?= htmlspecialchars($e['status']) ?>
+                                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                            </button>
+                            <?php else: ?>
+                                <span class="badge-status <?= htmlspecialchars($classeStatus) ?>">
+                                    <?= htmlspecialchars($e['status']) ?>
+                                </span>
+                            <?php endif; ?>
                         </td>
 
                         <td>
@@ -176,6 +222,7 @@
 
                                 <div class="dropdown-menu">
 
+                                    <?php if (!$entrevistaFinalizada): ?>
                                     <a
                                         href="?c=entrevista&m=editar&id=<?= $e['idEntrevista'] ?>">
                                         <i class="fa-solid fa-pen"></i>
@@ -187,22 +234,28 @@
                                         <i class="fa-solid fa-clipboard-check"></i>
                                         Finalizar Entrevista
                                     </a>
+                                    <?php endif; ?>
 
+
+<?php if (podeExcluir()): ?>
                                     <a
                                         href="?c=entrevista&m=excluir&id=<?= $e['idEntrevista'] ?>"
                                         onclick="return confirm('Deseja excluir esta entrevista?')">
                                         <i class="fa-solid fa-trash"></i>
                                         Excluir
                                     </a>
+<?php endif; ?>
 
-                                    <a
-                                        href="?c=entrevista&m=reagendar&id=<?= $e['idEntrevista'] ?>">
+                                    <?php if (!$entrevistaFinalizada): ?>
+                                        <a
+                                            href="?c=entrevista&m=reagendar&id=<?= $e['idEntrevista'] ?>">
 
-                                        <i class="fa-solid fa-calendar-days"></i>
+                                            <i class="fa-solid fa-calendar-days"></i>
 
-                                        Reagendar
+                                            Reagendar
 
-                                    </a>
+                                        </a>
+                                    <?php endif; ?>
 
                                     <a
                                         type="button"
@@ -227,7 +280,7 @@
 
                 <tr>
 
-                    <td colspan="7">
+                    <td colspan="8">
 
                         Nenhuma entrevista encontrada.
 
@@ -317,7 +370,6 @@
 
         let html = "";
 
-        console.log(historico);
         historico.forEach(
             item => {
 
@@ -421,4 +473,6 @@
         }
     );
 </script>
+<?php include "view/candidatura/modal_recusa.php"; ?>
+<script src="public/js/recusa-modal.js?v=<?= filemtime('public/js/recusa-modal.js') ?>"></script>
 <script src="public/js/pesquisa.js"></script>

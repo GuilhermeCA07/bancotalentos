@@ -167,7 +167,8 @@ class Candidatura
     }
 
     function excluir($id)
-    {
+    {
+        validarPermissaoExclusao();
         $this->model->excluir($id);
 
         voltarParaRetorno('Location: ?c=candidatura');
@@ -187,6 +188,63 @@ class Candidatura
 
         header('Location: ?c=candidatura');
 
+        exit;
+    }
+
+    public function detalhesRecusa($id)
+    {
+        $this->responderDetalhesResultado(
+            $id,
+            'Recusado'
+        );
+    }
+
+    public function detalhesResultado($id)
+    {
+        $this->responderDetalhesResultado($id);
+    }
+
+    private function responderDetalhesResultado(
+        $id,
+        $resultadoEsperado = null
+    ) {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $idCandidatura = (int)$id;
+
+        if ($idCandidatura <= 0) {
+            http_response_code(400);
+            echo json_encode([
+                'sucesso' => false,
+                'mensagem' => 'Candidatura invalida.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        $detalhes = $this->model
+            ->buscarDetalhesResultadoEntrevista($idCandidatura);
+
+        if (
+            $detalhes
+            && $resultadoEsperado !== null
+            && $detalhes['resultado'] !== $resultadoEsperado
+        ) {
+            $detalhes = null;
+        }
+
+        if (!$detalhes) {
+            http_response_code(404);
+            echo json_encode([
+                'sucesso' => false,
+                'mensagem' => 'Detalhes da entrevista não encontrados.'
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+
+        echo json_encode([
+            'sucesso' => true,
+            'dados' => $detalhes
+        ], JSON_UNESCAPED_UNICODE);
         exit;
     }
 }

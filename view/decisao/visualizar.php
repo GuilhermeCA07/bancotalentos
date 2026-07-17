@@ -69,7 +69,7 @@
 
                 <span class="
                 badge-status
-                <?= strtolower($decisao['status_candidatura']) ?>
+                <?= strtolower(str_replace(' ', '-', $decisao['status_candidatura'])) ?>
             ">
                     <?= $decisao['status_candidatura'] ?>
                 </span>
@@ -140,7 +140,7 @@
 
                 <span class="
                 badge-status
-                <?= strtolower($decisao['status_candidatura']) ?>
+                <?= strtolower(str_replace(' ', '-', $decisao['status_candidatura'])) ?>
             ">
                     <?= $decisao['status_candidatura'] ?>
                 </span>

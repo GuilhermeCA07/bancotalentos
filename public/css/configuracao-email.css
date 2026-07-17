@@ -1,0 +1,297 @@
+.email-config-topo {
+    align-items: flex-start;
+    gap: 24px;
+}
+
+.email-config-eyebrow {
+    color: var(--azul);
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.email-config-topo p,
+.email-config-section-title p {
+    color: #64748b;
+    margin: 5px 0 0;
+}
+
+.email-config-status {
+    align-items: center;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 6px;
+    color: #c2410c;
+    display: inline-flex;
+    font-size: 13px;
+    font-weight: 700;
+    gap: 8px;
+    padding: 9px 12px;
+    white-space: nowrap;
+}
+
+.email-config-status.testado {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #047857;
+}
+
+.email-config-alerta {
+    align-items: center;
+    border: 1px solid #a7f3d0;
+    border-radius: 6px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding: 12px 14px;
+}
+
+.email-config-alerta.sucesso {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.email-config-layout {
+    align-items: start;
+    display: grid;
+    gap: 22px;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 390px);
+}
+
+.email-config-principal {
+    display: grid;
+    gap: 22px;
+}
+
+.email-config-form,
+.email-config-test,
+.email-config-guide {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 22px;
+}
+
+.email-config-section-title {
+    align-items: flex-start;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+}
+
+.email-config-section-title h2 {
+    color: #0f172a;
+    font-size: 18px;
+    margin: 0;
+}
+
+.email-config-section-title > i {
+    color: var(--azul);
+    font-size: 20px;
+}
+
+.email-config-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 2fr 1fr 1fr;
+}
+
+.email-config-field {
+    display: grid;
+    gap: 7px;
+}
+
+.email-config-field-wide {
+    grid-column: span 2;
+}
+
+.email-config-field > span:first-child {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.email-config-field small {
+    color: #047857;
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+.email-config-field input,
+.email-config-field select {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: #0f172a;
+    font: inherit;
+    min-height: 42px;
+    padding: 9px 11px;
+    width: 100%;
+}
+
+.email-config-field input:focus,
+.email-config-field select:focus {
+    border-color: var(--azul);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--azul) 14%, transparent);
+    outline: none;
+}
+
+.email-config-password {
+    display: flex;
+    position: relative;
+}
+
+.email-config-password input {
+    padding-right: 44px;
+}
+
+.email-config-password button {
+    background: transparent;
+    border: 0;
+    color: #64748b;
+    cursor: pointer;
+    height: 40px;
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    width: 42px;
+}
+
+.email-config-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.email-config-test form {
+    align-items: end;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.email-config-test-button {
+    min-height: 42px;
+}
+
+.email-config-dates {
+    border-top: 1px solid #e2e8f0;
+    color: #64748b;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 12px;
+    gap: 8px 20px;
+    margin-top: 18px;
+    padding-top: 14px;
+}
+
+.email-config-steps {
+    counter-reset: smtp-step;
+    display: grid;
+    gap: 18px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.email-config-steps li {
+    counter-increment: smtp-step;
+    display: grid;
+    gap: 5px;
+    grid-template-columns: 32px minmax(0, 1fr);
+}
+
+.email-config-steps li::before {
+    align-items: center;
+    background: var(--azul);
+    border-radius: 50%;
+    color: #fff;
+    content: counter(smtp-step);
+    display: flex;
+    font-size: 13px;
+    font-weight: 800;
+    grid-row: 1 / span 3;
+    height: 28px;
+    justify-content: center;
+    width: 28px;
+}
+
+.email-config-steps strong {
+    color: #0f172a;
+    font-size: 14px;
+}
+
+.email-config-steps span {
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.email-config-steps a,
+.email-config-help {
+    color: var(--azul);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.email-config-note {
+    align-items: flex-start;
+    background: #f8fafc;
+    border-left: 3px solid var(--azul);
+    display: flex;
+    gap: 10px;
+    margin-top: 22px;
+    padding: 12px;
+}
+
+.email-config-note i {
+    color: var(--azul);
+    margin-top: 2px;
+}
+
+.email-config-note p {
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.email-config-help {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 18px;
+}
+
+@media (max-width: 1050px) {
+    .email-config-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .email-config-topo {
+        display: grid;
+    }
+
+    .email-config-grid,
+    .email-config-test form {
+        grid-template-columns: 1fr;
+    }
+
+    .email-config-field-wide {
+        grid-column: auto;
+    }
+
+    .email-config-form,
+    .email-config-test,
+    .email-config-guide {
+        padding: 16px;
+    }
+}
