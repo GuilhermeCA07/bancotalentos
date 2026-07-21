@@ -28,6 +28,7 @@ Sistema web para gestão de recrutamento e seleção, desde o cadastro público 
 O sistema inclui:
 
 - Cloudflare Turnstile nas áreas públicas e de autenticação.
+- CAPTCHA local temporário, carregado somente quando o Turnstile falha no navegador ou no servidor.
 - Autenticação em dois fatores por TOTP, compatível com Google Authenticator.
 - Opção de confiar no navegador por 30 dias.
 - Troca obrigatória de senha no primeiro acesso para novos usuários.
@@ -92,13 +93,31 @@ composer install --no-dev --optimize-autoloader
 mysql -u SEU_USUARIO -p NOME_DO_BANCO < backup.sql
 ```
 
+O dump inicial não está armazenado na pasta `database/migrations`; ele deve ser obtido com a equipe responsável pelo projeto.
+
+4. Aplique as migrations uma única vez, nesta ordem:
+
+```text
+database/migrations/20260716_status_linkedin_temas.sql
+database/migrations/20260716_status_entrevistado.sql
+database/migrations/20260716_departamentos.sql
+database/migrations/20260716_administrador_email_smtp.sql
+database/migrations/20260716_seguranca_acesso.sql
+database/migrations/20260716_dispositivos_confiaveis.sql
+database/migrations/20260716_identidade_visual.sql
+database/migrations/20260716_identidade_padrao.sql
+database/migrations/20260716_tema_violeta_padrao.sql
+database/migrations/20260716_usuario_reagendamento.sql
+database/migrations/20260720_periodo_experiencia.sql
+```
+
 Revise a migration de administradores antes de executá-la em outro ambiente, pois ela promove contas previamente definidas pelo projeto.
 
-4. Configure a conexão em `config/Conexao.php` para o banco do ambiente.
+5. Configure a conexão em `config/Conexao.php` para o banco do ambiente.
 
 > A implementação atual mantém os parâmetros da conexão nesse arquivo. Para produção ou repositório público, migre esses valores para variáveis de ambiente e mantenha apenas um arquivo de exemplo versionado.
 
-5. Defina chaves exclusivas para proteção dos dados sensíveis:
+6. Defina chaves exclusivas para proteção dos dados sensíveis:
 
 ```text
 EMAIL_CONFIG_KEY=<chave-aleatoria-segura>
@@ -113,15 +132,15 @@ php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
 
 Não altere essas chaves depois que senhas SMTP ou segredos de 2FA forem gravados, pois os dados existentes deixarão de ser descriptografados.
 
-6. Cadastre chaves próprias do Cloudflare Turnstile em `config/config.php`. Não reutilize chaves de produção em ambientes de desenvolvimento.
+7. Cadastre chaves próprias do Cloudflare Turnstile em `config/config.php`. Não reutilize chaves de produção em ambientes de desenvolvimento.
 
-7. Garanta permissão de escrita no diretório de currículos:
+8. Garanta permissão de escrita no diretório de currículos:
 
 ```text
 uploads/curriculos/
 ```
 
-8. Configure o VirtualHost do Apache com o diretório raiz do projeto como `DocumentRoot` e habilite o `mod_rewrite`.
+9. Configure o VirtualHost do Apache com o diretório raiz do projeto como `DocumentRoot` e habilite o `mod_rewrite`.
 
 Após entrar como administrador, configure o servidor SMTP pelo menu **Administração > E-mail do Token** e utilize o teste de envio disponível na própria tela.
 
@@ -172,10 +191,14 @@ Entrevista Agendada
 │  Aprovado   │  Recusado   │ Entrevistado │
 └─────────────┴─────────────┴──────────────┘
         ↓
+Experiência (3 meses)
+        ↓
 Contratado / Dispensado / Auto-Dispensa
 ```
 
 Uma vaga também pode terminar como **Vaga Fechada** por ação manual ou **Vaga Preenchida por Contratação** ao atingir a quantidade máxima de contratados.
+
+Durante a experiência, a vaga considera a posição ocupada. Candidatos já aprovados permanecem como reserva, mas só podem ser contratados quando houver capacidade. Uma dispensa ou auto-dispensa pausa a vaga e libera novamente a contratação da reserva. Ao completar três meses, a situação muda automaticamente para **Contratado**.
 
 ## Verificações
 
@@ -187,7 +210,13 @@ Get-ChildItem -Recurse -Filter *.php |
     ForEach-Object { php -l $_.FullName }
 ```
 
-O projeto também contém `tests/dashboard-js-smoke.js`, usado para validar a inicialização dos gráficos do dashboard em um ambiente JavaScript simulado.
+O projeto também contém `tests/dashboard-js-smoke.js`, que recebe o JavaScript renderizado do dashboard pela entrada padrão. Para validar o período de experiência:
+
+```powershell
+php tests/experiencia-smoke.php
+php tests/experiencia-integration.php
+php tests/contratacao-view-smoke.php
+```
 
 ## Publicação segura
 
@@ -205,4 +234,10 @@ Antes de enviar o código ao GitHub:
 
 ## Licença
 
-Este repositório ainda não possui um arquivo de licença. Antes de distribuí-lo, adicione uma `LICENSE` compatível com as regras de uso definidas pela organização.
+Copyright (c) 2026 Guilherme Coelho Araujo. Todos os direitos reservados.
+
+Este é um projeto proprietário disponibilizado apenas para visualização. Não é software livre nem de código aberto, e sua utilização, modificação, distribuição ou comercialização é proibida sem autorização prévia e escrita do titular.
+
+A NET.COM TELECOMUNICAÇÕES LTDA, CNPJ nº 16.740.329/0001-29, possui apenas uma licença especial de uso interno, gratuita, temporária, revogável, intransferível e sem transferência de propriedade.
+
+Consulte os termos completos no arquivo [`LICENSE`](LICENSE).
